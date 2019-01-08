@@ -1,6 +1,6 @@
-INSERT INTO items (name) VALUES('Go shopping');
-INSERT INTO items (name) VALUES('Feed dog');
-INSERT INTO items (name) VALUES('Swim practice');
-INSERT INTO items (name) VALUES('Code app');
-INSERT INTO items (name) VALUES('Meet gabriel');
-INSERT INTO items (name) VALUES('Eat bak kut teh');
+INSERT INTO items (name, complete) VALUES('Go shopping', false);
+INSERT INTO items (name, complete) VALUES('Feed dog', false);
+INSERT INTO items (name, complete) VALUES('Swim practice', false);
+INSERT INTO items (name, complete) VALUES('Code app', false);
+INSERT INTO items (name, complete) VALUES('Meet gabriel', false);
+INSERT INTO items (name, complete) VALUES('Eat bak kut teh', false);
