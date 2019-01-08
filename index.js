@@ -2,6 +2,7 @@ console.log("works!!", process.argv[2]);
 
 let input = process.argv[2];
 let inputDone = process.argv[3];
+let inputId = parseInt(inputDone);
 let inputArr = [];
 for(let i = 3; i < process.argv.length; i++){
     inputArr.push(process.argv[i]);
@@ -53,15 +54,13 @@ let queryFinCallback = (err) => {
         console.log( "error", err.message );
       }
 
-      let inputId = parseInt(inputDone);
-
       let text = `UPDATE items SET complete = 'true' WHERE id = ${inputId} RETURNING *`;
 
       client.query(text, (err, result) => {
         if (err) {
           console.log("query error", err.message);
         } else {
-            console.log("Updated todo-list:- ");
+            console.log("Item updated:- ");
             for(let i = 0; i < result.rows.length; i++){
                 if(result.rows[i].complete === false){
                     console.log(result.rows[i].id + ":", "[ ]" + " ", result.rows[i].name);
@@ -73,6 +72,46 @@ let queryFinCallback = (err) => {
         }
       });
     });
+};
+
+let queryDelCallback = (err) => {
+    client.connect((err) => {
+
+      if( err ){
+        console.log( "error", err.message );
+      }
+
+      let text = `DELETE from items WHERE id = ${inputId} RETURNING *`;
+
+      client.query(text, (err, result) => {
+        if (err) {
+          console.log("query error", err.message);
+        } else {
+            console.log("Item deleted:- ");
+            for(let i = 0; i < result.rows.length; i++){
+                if(result.rows[i].complete === false){
+                    console.log(result.rows[i].id + ":", "[ ]" + " ", result.rows[i].name);
+                }
+                else if(result.rows[i].complete === true){
+                    console.log(result.rows[i].id + ":", "[X]" + " ", result.rows[i].name);
+                }
+            }
+        }
+        queryRsCallback();
+      });
+    });
+};
+
+let queryRsCallback = (err) => {
+      let alter = `ALTER SEQUENCE items_id_seq RESTART`;
+
+      client.query(alter, queryUpdCallback);
+};
+
+let queryUpdCallback = (err) => {
+      let update = `UPDATE items set id = default;`;
+
+      client.query(update);
 };
 
 let queryDoneCallback = (err, result) => {
@@ -121,6 +160,9 @@ else if(input === "show"){
 else if(input === "done"){
     queryFinCallback();
 }
+else if(input === "delete"){
+    queryDelCallback();
+}
 else{
-    console.log("Error");
+    console.log("Error! No such command");
 }
