@@ -77,7 +77,7 @@ client.connect((err) => {
 		    break;
 
 		case 'DONE':
-			text = `UPDATE tasklist SET status='true', updated_on = now() WHERE task = '${task}' RETURNING *`;
+			text = `UPDATE tasklist SET status='true', updated_at = now() WHERE task = '${task}' RETURNING *`;
 			console.log('You have updated the following:');
 			show(text);
 		    break;
