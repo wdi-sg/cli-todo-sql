@@ -34,10 +34,10 @@ let queryShowCallback = (err) => {
             console.log("Updated todo-list:- ");
             for(let i = 0; i < result.rows.length; i++){
                 if(result.rows[i].complete === false){
-                    console.log(result.rows[i].id + ":", "[ ]" + " ", result.rows[i].name);
+                    console.log(result.rows[i].id + ":", "[ ]" + " ", result.rows[i].name, " " + result.rows[i].created_at);
                 }
                 else if(result.rows[i].complete === true){
-                    console.log(result.rows[i].id + ":", "[X]" + " ", result.rows[i].name);
+                    console.log(result.rows[i].id + ":", "[X]" + " ", result.rows[i].name, " " + result.rows[i].created_at);
                 }
             }
         }
@@ -89,12 +89,25 @@ let clientConnectionCallback = (err) => {
     console.log( "error", err.message );
   }
 
-  let text = "INSERT INTO items (name, complete) VALUES ($1, $2) RETURNING *";
+  let text = "INSERT INTO items (name, complete, created_at) VALUES ($1, $2, $3) RETURNING *";
 
   let inputStr = inputArr.join(' ');
   let outputStr = inputStr.charAt(0).toUpperCase() + inputStr.slice(1)
 
-  const values = [outputStr, false];
+  let today = new Date();
+  let dd = today.getDate();
+  let mm = today.getMonth() + 1;
+
+  let yyyy = today.getFullYear();
+    if (dd < 10) {
+        dd = '0' + dd;
+    }
+    if (mm < 10) {
+      mm = '0' + mm;
+    }
+  today = dd + '/' + mm + '/' + yyyy;
+
+  const values = [outputStr, false, today];
 
   client.query(text, values, queryDoneCallback);
 };
