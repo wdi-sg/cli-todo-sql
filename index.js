@@ -38,31 +38,33 @@ client.connect((err) => {
 
 	console.log("Starting PSQL");
 
-// 	let text = "SELECT * FROM students";
+	if (process.argv[2] == "") {
+		process.argv[2] = "undefined";
+	}
+
 	let command = (process.argv[2]).toUpperCase();
 	let task = process.argv[3];
 	let update = process.argv[4];
 
 	let text = "";
 
+	console.log("command: " + command);
+
 	switch (command) {
 
 		case 'SHOWALL':
 		    text = "SELECT * FROM tasklist";
 		    console.log('All tasks as follows:');
-			show(text);
 		    break;
 
 		case 'ADD':
 			text = `INSERT INTO tasklist (task) VALUES ('${task}') RETURNING *`;
 			console.log('You have added:');
-			show(text);
 		    break;
 
 		case 'DELETE':
 		    text = `DELETE FROM tasklist WHERE task = '${task}' RETURNING *`;
 		    console.log('You have deleted');
-			show(text);
 		    break;
 
 		case 'CLEAR':
@@ -73,18 +75,17 @@ client.connect((err) => {
 		case 'CHANGE':
 			text = `UPDATE tasklist SET task='${update}' WHERE task = '${task}' RETURNING *`;
 			console.log('You have changed the following:');
-			show(text);
 		    break;
 
 		case 'DONE':
 			text = `UPDATE tasklist SET status='true', updated_at = now() WHERE task = '${task}' RETURNING *`;
 			console.log('You have updated the following:');
-			show(text);
 		    break;
 
 		default:
+			text = "SELECT * FROM tasklist";
 		    console.log(`Please use 'showall, insert, clear, or delete'`);
 		}
-
+	show(text);
 });
 
