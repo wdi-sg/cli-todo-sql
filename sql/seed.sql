@@ -1,0 +1,1 @@
+INSERT INTO students (name, phone, email) VALUES ('hello', 'bye', 'monkey');
