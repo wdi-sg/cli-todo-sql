@@ -12,6 +12,19 @@ const configs = {
 const client = new pg.Client(configs);
 const num = process.argv[3];
 
+const banner = `
+@@@@@@@   @@@@@@      @@@@@@@    @@@@@@      @@@       @@@   @@@@@@   @@@@@@@
+@@@@@@@  @@@@@@@@     @@@@@@@@  @@@@@@@@     @@@       @@@  @@@@@@@   @@@@@@@
+  @@!    @@!  @@@     @@!  @@@  @@!  @@@     @@!       @@!  !@@         @@!
+  !@!    !@!  @!@     !@!  @!@  !@!  @!@     !@!       !@!  !@!         !@!
+  @!!    @!@  !@!     @!@  !@!  @!@  !@!     @!!       !!@  !!@@!!      @!!
+  !!!    !@!  !!!     !@!  !!!  !@!  !!!     !!!       !!!   !!@!!!     !!!
+  !!:    !!:  !!!     !!:  !!!  !!:  !!!     !!:       !!:       !:!    !!:
+  :!:    :!:  !:!     :!:  !:!  :!:  !:!      :!:      :!:      !:!     :!:
+   ::    ::::: ::      :::: ::  ::::: ::      :: ::::   ::  :::: ::      ::
+   :      : :  :      :: :  :    : :  :      : :: : :  :    :: : :       :`;
+
+
 var add = () => {
 
     let queryDoneCallback = (err, result) => {
@@ -38,7 +51,7 @@ client.connect(clientConnectionCallback);
 
 
 var show = () => {
-
+console.log(banner);
     let queryDoneCallback = (err, result) => {
         if (err) {
           console.log("query error", err.message);
