@@ -4,6 +4,6 @@ CREATE TABLE IF NOT EXISTS tasklist (
     status BOOLEAN,
     created_on DATE DEFAULT now(),
     created_at TIMESTAMP DEFAULT now(),
-    updated_on TEXT,
-    updated_at TEXT
+    updated_on DATE,
+    updated_at TIMESTAMP
 );

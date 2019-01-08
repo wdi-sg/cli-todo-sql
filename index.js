@@ -21,7 +21,14 @@ const show = text => {
 		if( err ){
      	console.log( "error", err.message );
     	} else {
-			console.log("result: ", res.rows); 
+			// console.log("result: ", res.rows); 
+			for(let i=0; i<res.rows.length; i++) {
+				if(res.rows[i].status === true) {
+	                console.log((i+1)+". [X] - "+res.rows[i].task+" - Created On: "+res.rows[i].created_at+" - Updated On: "+res.rows[i].updated_at);
+	            } else {
+	                console.log((i+1)+". [ ] - "+res.rows[i].task+" - Created On: "+res.rows[i].created_at+" - Updated On: "+res.rows[i].updated_at);
+            }
+			}
 		};
 	})
 }
@@ -46,7 +53,7 @@ client.connect((err) => {
 			show(text);
 		    break;
 
-		case 'INSERT':
+		case 'ADD':
 			text = `INSERT INTO tasklist (task) VALUES ('${task}') RETURNING *`;
 			console.log('You have added:');
 			show(text);
@@ -70,7 +77,7 @@ client.connect((err) => {
 		    break;
 
 		case 'DONE':
-			text = `UPDATE tasklist SET status='true' WHERE task = '${task}' RETURNING *`;
+			text = `UPDATE tasklist SET status='true', updated_on = now() WHERE task = '${task}' RETURNING *`;
 			console.log('You have updated the following:');
 			show(text);
 		    break;
