@@ -139,7 +139,6 @@ const del = (userInput) => {
             }
 
 
-
             client.end((err) => {
                 console.log('auto quitting PSQL~')
                 if (err) {
