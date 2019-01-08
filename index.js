@@ -35,10 +35,10 @@ let queryShowCallback = (err) => {
             console.log("Updated todo-list:- ");
             for(let i = 0; i < result.rows.length; i++){
                 if(result.rows[i].complete === false){
-                    console.log(result.rows[i].id + ":", "[ ]" + " ", result.rows[i].name, " " + result.rows[i].created_at);
+                    console.log(result.rows[i].id + ":", "[ ]" + " ", result.rows[i].name, " " + result.rows[i].created_at, " " + result.rows[i].updated_at);
                 }
                 else if(result.rows[i].complete === true){
-                    console.log(result.rows[i].id + ":", "[X]" + " ", result.rows[i].name, " " + result.rows[i].created_at);
+                    console.log(result.rows[i].id + ":", "[X]" + " ", result.rows[i].name, " " + result.rows[i].created_at, " " + result.rows[i].updated_at);
                 }
             }
         }
@@ -54,7 +54,7 @@ let queryFinCallback = (err) => {
         console.log( "error", err.message );
       }
 
-      let text = `UPDATE items SET complete = 'true' WHERE id = ${inputId} RETURNING *`;
+      let text = `UPDATE items SET complete = 'true', updated_at = 'now()' WHERE id = ${inputId}`;
 
       client.query(text, (err, result) => {
         if (err) {
