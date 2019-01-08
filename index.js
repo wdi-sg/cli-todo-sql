@@ -54,7 +54,7 @@ let queryFinCallback = (err) => {
         console.log( "error", err.message );
       }
 
-      let text = `UPDATE items SET complete = 'true', updated_at = 'now()' WHERE id = ${inputId}`;
+      let text = `UPDATE items SET complete = 'true', updated_at = 'now()' WHERE id = ${inputId} RETURNING *`;
 
       client.query(text, (err, result) => {
         if (err) {
@@ -66,7 +66,7 @@ let queryFinCallback = (err) => {
                     console.log(result.rows[i].id + ":", "[ ]" + " ", result.rows[i].name);
                 }
                 else if(result.rows[i].complete === true){
-                    console.log(result.rows[i].id + ":", "[X]" + " ", result.rows[i].name);
+                    console.log(result.rows[i].id + ":", "[X]" + " ", result.rows[i].name, " " + result.rows[i].updated_at);
                 }
             }
         }
