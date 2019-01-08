@@ -137,7 +137,6 @@ const del = (userInput) => {
                     console.log('adjusting index working!')
                 })
             }
-
             client.end((err) => {
                 console.log('auto quitting PSQL~')
                 if (err) {
