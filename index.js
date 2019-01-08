@@ -26,14 +26,16 @@ var add = () => {
         if( err ){
             console.log( "error", err.message );
         } else {
-            let text = "INSERT INTO items (name) VALUES ($1) RETURNING id, name";
-            const values = [process.argv[3]];
+            let text = "INSERT INTO items (name) VALUES ($1) RETURNING id, name";   //query INSERT to name, return id and name
+            const values = [process.argv[3]];                                       //values refer to VALUE ($1)
 
-            client.query(text, values, queryDoneCallback);
+            client.query(text, values, queryDoneCallback);                          //callback for query
         }
     };
 client.connect(clientConnectionCallback);
 }
+
+
 
 var show = () => {
 
@@ -55,7 +57,6 @@ var show = () => {
     };
 
     let clientConnectionCallback = (err) => {
-
         if( err ){
             console.log( "error", err.message );
         } else {
@@ -68,23 +69,22 @@ client.connect(clientConnectionCallback);
 }
 
 
-var done = () => {
 
-    //query for
+var done = () => {
+    //query for Update on done item
     let queryUpdateCallback = (err,result) => {
         if (err) {
             console.log("query error", err.message);
         } else {
-            console.log(`Item ${num} deleted`)
+            console.log(`Item ${num} done`)
         }
     };
-
-
+    //query to show the whole list
     let queryDoneCallback = (err, result) => {
         if (err) {
             console.log("query error", err.message);
         } else {
-            const length = result.rows.length;
+            const length = result.rows.length;  //get length of array
             const items = result.rows;
             //iterate items, if status = false [ ], else if status = true [x]
             for(let j = 0; j < length; j++) {
@@ -97,23 +97,46 @@ var done = () => {
         }
     };
 
-
     let clientConnectionCallback = (err) => {
-
         if( err ){
             console.log( "error", err.message );
         } else {
-            let select = `UPDATE items SET status = TRUE WHERE id = ${num}`;
-            let show = "SELECT * FROM items ORDER BY id ASC";
+            let select = `UPDATE items SET status = TRUE WHERE id = ${num}`;    //set the selected number item status to TRUE
+            let show = "SELECT * FROM items ORDER BY id ASC";                   //show everything items table
 
-            client.query(select, queryDeleteCallback);
-            client.query(show, queryUpdateCallback);
+            client.query(select, queryUpdateCallback);                          //callback for UPDATE query
+            client.query(show, queryDoneCallback);                              //callback for SELECT * FROM items query
         }
     };
 client.connect(clientConnectionCallback);
 }
 
 
+
+var del = () => {
+
+    let queryDoneCallback = (err, result) => {
+        if (err) {
+            console.log("query error", err.message);
+        } else {
+            console.log(`Delete item ${num}`);
+        }
+    };
+
+    let clientConnectionCallback = (err) => {
+        if( err ){
+            console.log( "error", err.message );
+        } else {
+            let delText = `DELETE from items WHERE id = ${num}`;
+
+            client.query(delText, queryDoneCallback);              //callback for query
+        }
+    };
+client.connect(clientConnectionCallback);
+}
+
+
+//switch case for add,show,done and delete items
 switch (process.argv[2]) {
     case "add":
     add ();
@@ -123,5 +146,8 @@ switch (process.argv[2]) {
     break;
     case "done":
     done();
+    break;
+    case "delete":
+    del();
     break;
 }
