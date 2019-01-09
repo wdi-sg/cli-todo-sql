@@ -23,7 +23,7 @@ let queryDoneCallback = (err, result) => {
       } else {
           x = ' ';
       }
-      console.log(`${result.rows[i].id}.    Completed    - [${x}] 
+      console.log(`${result.rows[i].number}.    Completed    - [${x}] 
       Things to do - ${result.rows[i].todo} 
       Created at   - ${result.rows[i].created_at} 
       Last done at - ${result.rows[i].updated_at}`)
@@ -40,22 +40,22 @@ const add = () => {
 };
 
 const show = () => {
-  let queryItem = `SELECT * FROM items;`;
+  let queryItem = `SELECT * FROM items ORDER BY number ASC;`;
 
   client.query(queryItem, queryDoneCallback);
 };
 
 const done = () => {
-  let update = `UPDATE items SET completion = 'True', updated_at = now() WHERE id = ${userInput};
-  ALTER SEQUENCE items_id_seq RESTART;
-  UPDATE items SET id = DEFAULT;`;
+  let update = `UPDATE items SET completion = 'True', updated_at = now() WHERE number = ${userInput};
+  ALTER SEQUENCE items_number_seq RESTART;
+  UPDATE items SET number = DEFAULT;`;
   client.query(update, show);
 }
 
 const remove = () => {
-  let remove = `DELETE FROM items WHERE id = ${userInput};
-  ALTER SEQUENCE items_id_seq RESTART;
-  UPDATE items SET id = DEFAULT;`;
+  let remove = `DELETE FROM items WHERE number = ${userInput};
+  ALTER SEQUENCE items_number_seq RESTART;
+  UPDATE items SET number = DEFAULT;`;
 
   client.query(remove, show);
 }
