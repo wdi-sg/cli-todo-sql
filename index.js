@@ -1,5 +1,3 @@
-console.log("works!!", process.argv[2]);
-
 const pg = require('pg');
 
 const configs = {
@@ -30,15 +28,15 @@ let queryDoneCallback = (err, result) => {
       Created at   - ${result.rows[i].created_at} 
       Last done at - ${result.rows[i].updated_at}`)
     }
-    
   }
+  process.exit();
 };
 
 const add = () => {
   let addItem = `INSERT INTO items (completion, todo) VALUES($1, $2);`;
   const values = [false, userInput]
 
-  client.query(addItem, values, queryDoneCallback);
+  client.query(addItem, values, show);
 };
 
 const show = () => {
@@ -48,12 +46,10 @@ const show = () => {
 };
 
 const done = () => {
-  let update = `UPDATE items SET completion = 'True' WHERE id = ${userInput};
-  UPDATE items SET updated_at = now() WHERE id = ${userinput};
+  let update = `UPDATE items SET completion = 'True', updated_at = now() WHERE id = ${userInput};
   ALTER SEQUENCE items_id_seq RESTART;
   UPDATE items SET id = DEFAULT;`;
-
-  client.query(update, queryDoneCallback);
+  client.query(update, show);
 }
 
 const remove = () => {
@@ -61,7 +57,7 @@ const remove = () => {
   ALTER SEQUENCE items_id_seq RESTART;
   UPDATE items SET id = DEFAULT;`;
 
-  client.query(remove, queryDoneCallback);
+  client.query(remove, show);
 }
 
 const info = () => {
@@ -72,6 +68,12 @@ const info = () => {
   console.log(`  ██   ██║██║   ██║╚════██║   ██║       ██║  ██║██║   ██║    ██║   ██║   `)
   console.log(`  ╚█████╔╝╚██████╔╝███████║   ██║       ██████╔╝╚██████╔╝    ██║   ██║   `)
   console.log(`   ╚════╝  ╚═════╝ ╚══════╝   ╚═╝       ╚═════╝  ╚═════╝     ╚═╝   ╚═╝   `)
+  console.log(`  =======================================================================`)
+  console.log(`   Use the following commands:`)
+  console.log(`   1: node todo.js add " "`)
+  console.log(`   2: node todo.js show`)
+  console.log(`   3: node todo.js done #`)
+  console.log(`   4: node todo.js delete #`)
   console.log(`  =======================================================================`)
 }
 
