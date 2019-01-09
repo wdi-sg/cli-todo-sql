@@ -1,6 +1,6 @@
 console.log("works!!", process.argv[2]);
 
-let input = process.argv[2];
+const input = process.argv[2];
 let inputDone = process.argv[3];
 let inputId = parseInt(inputDone);
 let inputArr = [];
@@ -127,42 +127,30 @@ let clientConnectionCallback = (err) => {
   if( err ){
     console.log( "error", err.message );
   }
+    let text = "INSERT INTO items (name, complete, created_at) VALUES ($1, $2, $3) RETURNING *";
 
-  let text = "INSERT INTO items (name, complete, created_at) VALUES ($1, $2, $3) RETURNING *";
+    let inputStr = inputArr.join(' ');
+    let outputStr = inputStr.charAt(0).toUpperCase() + inputStr.slice(1)
 
-  let inputStr = inputArr.join(' ');
-  let outputStr = inputStr.charAt(0).toUpperCase() + inputStr.slice(1)
+    let today = new Date();
 
-  let today = new Date();
-  let dd = today.getDate();
-  let mm = today.getMonth() + 1;
+    const values = [outputStr, false, today];
 
-  let yyyy = today.getFullYear();
-    if (dd < 10) {
-        dd = '0' + dd;
+    if(input === "add"){
+        client.query(text, values, queryDoneCallback);
     }
-    if (mm < 10) {
-      mm = '0' + mm;
+    else if(input === "show"){
+        queryShowCallback();
     }
-  today = dd + '/' + mm + '/' + yyyy;
-
-  const values = [outputStr, false, today];
-
-  client.query(text, values, queryDoneCallback);
+    else if(input === "done"){
+        queryFinCallback();
+    }
+    else if(input === "delete"){
+        queryDelCallback();
+    }
+    else{
+        console.log("Error! No such command");
+    }
 };
 
-if(input === "add"){
-    client.connect(clientConnectionCallback);
-}
-else if(input === "show"){
-    queryShowCallback();
-}
-else if(input === "done"){
-    queryFinCallback();
-}
-else if(input === "delete"){
-    queryDelCallback();
-}
-else{
-    console.log("Error! No such command");
-}
+client.connect(clientConnectionCallback);
