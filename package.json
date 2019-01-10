@@ -1,0 +1,26 @@
+{
+  "name": "cli-todo-sql",
+  "version": "1.0.0",
+  "description": "A simple postgres user-task-location todo list.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kauvia/cli-todo-sql.git"
+  },
+  "author": "kauvia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kauvia/cli-todo-sql/issues"
+  },
+  "homepage": "https://github.com/kauvia/cli-todo-sql#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "pg": "^7.7.1",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^4.42.0"
+  }
+}

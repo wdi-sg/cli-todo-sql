@@ -1,35 +1,27 @@
-console.log("works!!", process.argv[2]);
+const express = require("express");
+const app = express();
+const http = require('http').Server(app)
+const bodyParser= require('body-parser');
 
-const pg = require('pg');
+const hostname = '127.0.0.1';
+const port = 3001;
 
-const configs = {
-    user: 'akira',
-    host: '127.0.0.1',
-    database: 'todo',
-    port: 5432,
-};
 
-const client = new pg.Client(configs);
+// Parse incoming requests data
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-let queryDoneCallback = (err, result) => {
-    if (err) {
-      console.log("query error", err.message);
-    } else {
-      console.log("result", result.rows );
-    }
-};
+app.get('*', (req, res) => res.status(200).send({
+  message: 'Welcome to the default API route',
+}));
 
-let clientConnectionCallback = (err) => {
+http.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+});
 
-  if( err ){
-    console.log( "error", err.message );
-  }
-
-  let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
-
-  const values = ["hello"];
-
-  client.query(text, values, queryDoneCallback);
-};
-
-client.connect(clientConnectionCallback);
+const Role = require("./models").Role
+Role.create({
+  name: "President"
+})
+  .then(role => console.log(role))
+  .catch(err => console.log(err));
