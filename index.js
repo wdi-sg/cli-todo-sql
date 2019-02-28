@@ -4,15 +4,7 @@ console.log("works!!", process.argv[2], 'anddd ' +process.argv[3]);
 let instruction = process.argv[2], dbIndex = process.argv[3];
 const pg = require('pg');
 
-if (process.argv[2].toLowerCase() === 'done'){
-    //UPDATE todosql SET completed= true WHERE id= dbIndex;
-    let text = UPDATE todosql SET completed = true WHERE id= dbIndex;
-    //const values = [false, 'go for a run'];
-    client.query(text, queryDoneCallback);
-}else if (process.argv[2] === 'view'){
-    let text = 'SELECT * FROM todosql';
-    client.query(text, queryDoneCallback);
-}
+
 
 const configs = { //config file for logging into postgresql
     user: 'kennethyeong',
@@ -44,4 +36,14 @@ let clientConnectionCallback = (err) => {
     //client.query(text, values, queryDoneCallback);
   }
 };
+
+if (process.argv[2].toLowerCase() === 'done'){
+    //UPDATE todosql SET completed= true WHERE id= dbIndex;
+    let text = `UPDATE todosql SET completed = true WHERE id= ${dbIndex}`;
+    //const values = [false, 'go for a run'];
+    client.query(text, queryDoneCallback);
+}else if (process.argv[2] === 'view'){
+    let text = 'SELECT * FROM todosql';
+    client.query(text, queryDoneCallback);
+}
 client.connect(clientConnectionCallback);
