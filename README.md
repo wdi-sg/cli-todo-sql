@@ -51,19 +51,12 @@ Create the DB:
 CREATE DATABASE todo
 ```
 
-Create a tables.sql file:
+Create a table:
 ```
 CREATE TABLE IF NOT EXISTS items (
   id SERIAL PRIMARY KEY,
   name text
 );
-```
-
-(you can create a seed.sql file if you want).
-
-Run tables.sql
-```
-psql -d todo -U USERNAME -f tables.sql
 ```
 
 Now you can start coding the `index.js` file. The one provided has some boilerplate code for you to start.
@@ -84,9 +77,10 @@ node todo.js done 4
 5. [ ] - meet gabriel
 6. [ ] - eat bak kut teh
 ```
+Note that you may need to change your table to allow for "completion" of an item.
 
 #### Further:
-Add a column named `created_at` with data type date and display the date the item was added.
+Add a column named `created_at` with data type date and display the date the item was added. Look ahead in the gitbook for how to format the date type with `pg` library [https://wdi-sg.github.io/gitbook-2019/04-databases/postgres/sql-working.html](https://wdi-sg.github.io/gitbook-2019/04-databases/postgres/sql-working.html)
 
 #### Further:
 Add the ability to permanently delete an item.
