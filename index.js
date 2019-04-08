@@ -48,12 +48,28 @@ var setConsoleMessages = function (content) {
     });
 }
 
+var executeWriteQuery = function (sqlQuery, values) {
+    client.connectAsync()
+        .then( () => {
+            client.queryAsync(sqlQuery, values)
+                .then( () => {
+                    client.end();
+                })
+                .catch( (err) => {
+                    client.end();
+                    console.log("query error: ", err.message);
+                });
+        })
+        .catch( (err) => {
+            client.end();
+            console.log("connection error: ", err.message);
+        });
+}
+
 //===================================
 // Function
 //===================================
-var showTasks = function () {
-    let sqlQuery = 'SELECT * FROM items ORDER BY id';
-
+var showTasks = async function () {
     client.connectAsync()
         .then( () => {
             client.queryAsync(sqlQuery)
@@ -72,11 +88,12 @@ var showTasks = function () {
                     client.end();
                 })
                 .catch( (err) => {
-                    console.log("query error: ", err.message);
                     client.end();
+                    console.log("query error: ", err.message);
                 });
         })
         .catch( (err) => {
+            client.end();
             console.log("connection error: ", err.message);
         });
 }
@@ -85,60 +102,21 @@ var addTask = function (task) {
     const values = [task, false, getCurrentDateAndTime()];
     let sqlQuery = 'INSERT INTO items (task, done, created_at) VALUES ($1, $2, $3)';
 
-    client.connectAsync()
-        .then( () => {
-            client.queryAsync(sqlQuery, values)
-                .then( () => {
-                    client.end();
-                })
-                .catch( (err) => {
-                    console.log("query error: ", err.message);
-                    client.end();
-                });
-        })
-        .catch( (err) => {
-            console.log("connection error: ", err.message);
-        });
+    executeQuery(sqlQuery, values);
 }
 
 var markTaskAsDone = function (id) {
     const values = [true, getCurrentDateAndTime(), id];
     let sqlQuery = 'UPDATE items SET done = $1, updated_at = $2 where id=$3';
 
-    client.connectAsync()
-        .then( () => {
-            client.queryAsync(sqlQuery, values)
-                .then( () => {
-                    client.end();
-                })
-                .catch( (err) => {
-                    console.log("query error: ", err.message);
-                    client.end();
-                });
-        })
-        .catch( (err) => {
-            console.log("connection error: ", err.message);
-        });
+    executeQuery(sqlQuery, values);
 }
 
 var deleteTask = function (id) {
     const values = [id];
     let sqlQuery = 'DELETE FROM items WHERE id=$1';
 
-    client.connectAsync()
-        .then( () => {
-            client.queryAsync(sqlQuery, values)
-                .then( () => {
-                    client.end();
-                })
-                .catch( (err) => {
-                    console.log("query error: ", err.message);
-                    client.end();
-                });
-        })
-        .catch( (err) => {
-            console.log("connection error: ", err.message);
-        });
+    executeQuery(sqlQuery, values);
 }
 
 
