@@ -1,9 +1,11 @@
 console.log("works!!", process.argv[2]);
 
+const input = process.argv[3];
+
 const pg = require('pg');
 
 const configs = {
-    user: 'akira',
+    user: 'valenlyn',
     host: '127.0.0.1',
     database: 'todo',
     port: 5432,
@@ -25,11 +27,20 @@ let clientConnectionCallback = (err) => {
     console.log( "error", err.message );
   }
 
-  let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
+  //==================================================//
+  //                 ADD NEW ITEM
 
-  const values = ["hello"];
+    if (process.argv[2] === "add") {
 
-  client.query(text, values, queryDoneCallback);
+        let text = `INSERT INTO todoItems (item, done) VALUES ('${input}', false)`;
+        client.query(text, queryDoneCallback);
+    }
+
+  // let text = "SELECT * FROM todoItems";
+
+  // const values = ["hello"];
+
+
 };
 
 client.connect(clientConnectionCallback);
