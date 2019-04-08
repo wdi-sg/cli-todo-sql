@@ -1,4 +1,4 @@
-console.log("works!!", process.argv[2]);
+console.log("~_~", process.argv[2]);
 
 const input = process.argv[3];
 
@@ -13,34 +13,73 @@ const configs = {
 
 const client = new pg.Client(configs);
 
-let queryDoneCallback = (err, result) => {
-    if (err) {
-      console.log("query error", err.message);
-    } else {
-      console.log("result", result.rows );
-    }
-};
 
-let clientConnectionCallback = (err) => {
+//==================ADD ITEM======================//
 
-  if( err ){
-    console.log( "error", err.message );
-  }
+// if (process.argv[2] === "add") {
 
-  //==================================================//
-  //                 ADD NEW ITEM
+//     const onQueryFinished = (err, result) => {
+//         if (err) {
+//           console.log("query error", err.message);
+//         } else {
+//         //   for( let i=0; i<result.rows.length; i++ ){
+//         //     console.log("result: ", result.rows[i].name);
+//         //   }
+//         // }
+//     };
 
-    if (process.argv[2] === "add") {
+//     const onConnectServer = (err) => {
 
-        let text = `INSERT INTO todoItems (item, done) VALUES ('${input}', false)`;
-        client.query(text, queryDoneCallback);
-    }
+//         if( err ){
+//             console.log( "error", err.message );
+//         }
 
-  // let text = "SELECT * FROM todoItems";
+//         let text = `INSERT INTO todoItems (item, done) VALUES ('${input}', false)`;
 
-  // const values = ["hello"];
+//         client.query(text, onQueryFinished);
 
+//     };
 
-};
+//     client.connect(onConnectServer);
 
-client.connect(clientConnectionCallback);
+// }
+
+//=================SHOW ITEMS=====================//
+
+if (process.argv[2] === "show") {
+
+    let boxDisplay = "";
+
+    const onQueryFinished = (err, result) => {
+        if (err) {
+          console.log("query error", err.message);
+        } else {
+
+          for( let i=0; i<result.rows.length; i++ ){
+
+            if (result.rows[i].done === false) {
+                boxDisplay = "[ ]";
+            } else {
+                boxDisplay = "[x]";
+            }
+
+            console.log((i+1) + ". " + boxDisplay + " – " + result.rows[i].item);
+          }
+        }
+    };
+
+    const onConnectServer = (err) => {
+
+        if( err ){
+            console.log( "error", err.message );
+        }
+
+        let text = "SELECT item, done FROM todoItems";
+
+        client.query(text, onQueryFinished);
+
+    };
+
+    client.connect(onConnectServer);
+
+}
