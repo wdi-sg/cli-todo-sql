@@ -13,16 +13,21 @@ const configs = {
 
 const client = new pg.Client(configs);
 
+const art = "           *-*,\n       ,*\\/|`| \\\n       \\'  | |'| *,\n        \\ `| | |/ )\n         | |'| , /\n         |'| |, /\n       __|_|_|_|_\n      [___________]\n       |         |\n       |  VAL'S  |\n       |  TODO   |\n       |  LIST   |\n       |_________|";
+
 //=================SHOW ITEMS=====================//
 
 function show() {
 
     let boxDisplay = "";
+    let array = [];
 
     const onQueryFinished = (err, result) => {
         if (err) {
           console.log("query error", err.message);
         } else {
+
+          console.log(art);
 
           for( let i=0; i<result.rows.length; i++ ){
 
@@ -32,8 +37,15 @@ function show() {
                 boxDisplay = "[x]";
             }
 
-            console.log(result.rows[i].id + ". " + boxDisplay + " – " + result.rows[i].item + " " + result.rows[i].created_at);
+            array.push(result.rows[i].id + ". " + boxDisplay + " – " + result.rows[i].item + " " + result.rows[i].created_at);
           }
+
+           array.sort();
+
+            for (let i = 0; i < array.length; i++) {
+                console.log(array[i]);
+            }
+
         }
     };
 
