@@ -51,19 +51,12 @@ Create the DB:
 CREATE DATABASE todo
 ```
 
-Create a tables.sql file:
+Create a table:
 ```
 CREATE TABLE IF NOT EXISTS items (
   id SERIAL PRIMARY KEY,
   name text
 );
-```
-
-(you can create a seed.sql file if you want).
-
-Run tables.sql
-```
-psql -d todo -U USERNAME -f tables.sql
 ```
 
 Now you can start coding the `index.js` file. The one provided has some boilerplate code for you to start.
