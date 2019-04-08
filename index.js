@@ -83,8 +83,35 @@ var done = function (itemNum) {
         if( err ){
             console.log( "error", err.message );
         }
+        // const now = ;
+        let queryText = "UPDATE items SET done='done', updated_at='NOW' WHERE id = '"+itemNum+"';";
 
-        let queryText = "UPDATE items SET done='done' WHERE id = '"+itemNum+"';";
+        client.query(queryText, onQueryFinished);
+
+    };
+
+    client.connect(onConnectServer);
+
+}
+
+var del = function (itemNum) {
+
+    const onQueryFinished = (err, result) => {
+        if (err) {
+            console.log("query error", err.message);
+        } else {
+            for( let i=0; i<result.rows.length; i++ ){
+                console.log("deleted: ", itemNum + " from the list");
+            }
+        }
+    };
+    const onConnectServer = (err) => {
+
+        if( err ){
+            console.log( "error", err.message );
+        }
+        // const now = ;
+        let queryText = "DELETE FROM items WHERE id='"+itemNum+"';";
 
         client.query(queryText, onQueryFinished);
 
@@ -104,4 +131,6 @@ if (calledFunction == "add") {
     show();
 } else if (calledFunction == "done") {
     done(userInput);
+} else if (calledFunction == "delete") {
+    del(userInput);
 }
