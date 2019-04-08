@@ -77,6 +77,7 @@ node todo.js done 4
 5. [ ] - meet gabriel
 6. [ ] - eat bak kut teh
 ```
+Note that you may need to change your table to allow for "completion" of an item.
 
 #### Further:
 Add a column named `created_at` with data type date and display the date the item was added.
