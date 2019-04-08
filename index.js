@@ -16,9 +16,7 @@ let queryDoneCallback = (err, result) => {
   if (err) {
     console.log("query error", err.message);
   } else {
-
     //reorder database here?
-
 
     for (let i = 0; i < result.rows.length; i++) {
       const row = result.rows[i];
@@ -64,6 +62,17 @@ let clientConnectionCallback = err => {
     }
     let id = process.argv[3];
     text = "UPDATE items SET done='t' WHERE id = " + id.toString();
+  } else if (process.argv[2] === "undone") {
+    if (process.argv[3] === undefined) {
+      console.log("missing 4th argument!");
+      return;
+    }
+    if (typeof parseInt(process.argv[3]) === NaN) {
+      console.log("you need to enter in the id NUMBER");
+      return;
+    }
+    let id = process.argv[3];
+    text = "UPDATE items SET done='f' WHERE id = " + id.toString();
   } else if (process.argv[2] === "delete") {
     if (process.argv[3] === undefined) {
       console.log("missing 4th argument!");
@@ -74,7 +83,7 @@ let clientConnectionCallback = err => {
       return;
     }
     let id = process.argv[3];
-    text = "DELETE FROM items WHERE id="+id;
+    text = "DELETE FROM items WHERE id=" + id;
   } else if (process.argv[2] === "display") {
     text = "SELECT * FROM items ORDER BY name ASC";
   } else {
