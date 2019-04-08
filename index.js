@@ -31,7 +31,7 @@ let clientConnectionCallback = (err) => {
 
     if (process.argv[2] === "show") {
 
-        let querytext = 'SELECT * FROM students'
+        let querytext = 'SELECT * FROM students;';
 
         client.query(querytext, queryDoneCallback);
     };
