@@ -42,14 +42,13 @@ let actionCompleted = (err,result) => {
 
 //ADD TASK
 let addTasks = (taskItem) => {
-    let task = taskItem;
+    let singleTask = taskItem;
+    const now = new Date()
     client.connect(addTask = () =>{
-        let text = `INSERT INTO items (task) VALUES ($1) RETURNING id`;
-        let values = [];
-        values.push(task);
-        console.log(values);
-        console.log(typeof values);
-        client.query(text, values, actionCompleted);
+
+        let text = `INSERT INTO items (task,created_at) VALUES ($1,$2);`
+
+        client.query(text, [singleTask, now], actionCompleted);
     })
 }
 
