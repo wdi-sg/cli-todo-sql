@@ -80,7 +80,7 @@ node todo.js done 4
 Note that you may need to change your table to allow for "completion" of an item.
 
 #### Further:
-Add a column named `created_at` with data type date and display the date the item was added.
+Add a column named `created_at` with data type date and display the date the item was added. Look ahead in the gitbook for how to format the date type with `pg` library [https://wdi-sg.github.io/gitbook-2019/04-databases/postgres/sql-working.html](https://wdi-sg.github.io/gitbook-2019/04-databases/postgres/sql-working.html)
 
 #### Further:
 Add the ability to permanently delete an item.
