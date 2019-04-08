@@ -10,20 +10,32 @@ const configs = {
 };
 
 const client = new pg.Client(configs);
-let command = String(process.argv[2]);
-let activity = String(process.argv[3]);
+const COMMAND = (process.argv[2]);
+const ACTIVITY = (process.argv[3]); //takes a string (in the case of add and delete; or a number (in the case of DONE)
 
 let queryDoneCallback = (err, result) => {
-    if (err) {
+  if (err) {
       console.log("query error", err.message);
-    } else {
-      for (let i = 0; i<result.rows.length;i++){
-      console.log(result.rows[i].id + ". " + result.rows[i].completion + " - " + result.rows[i].name+ " - "+result.rows[i].created_at+" - "+result.rows[i].udpated_at);
-      }
+  }else{
+    if (result.rows.length == 1){
+      console.log(result.rows[0].id+". "+result.rows[0].completion+ " - " + result.rows[0].name);
     }
+    else if(result.rows.length>1){
+      for (let i = 0; i<result.rows.length;i++){
+      console.log(result.rows[i].id + ". " + result.rows[i].completion + " - " + result.rows[i].name);
+      };
+    };
+  };
 };
 
+
 let clientConnectionCallback = (err) => {
+
+  let today = new Date();  //source: https://stackoverflow.com/questions/1531093/how-do-i-get-the-current-date-in-javascript
+  let dd = String(today.getDate()).padStart(2, '0');
+  let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+  let yyyy = today.getFullYear();
+  today = dd + '/' + mm + '/' + yyyy;
 
   if( err ){
     console.log( "error", err.message );
@@ -36,35 +48,47 @@ let clientConnectionCallback = (err) => {
   // client.query(text, queryDoneCallback);
 // };
 
-  if (command === "show"){
+  if (COMMAND === "show"){
 
       let text = "SELECT * FROM items";
 
       client.query(text, queryDoneCallback);
   }
 
-  if (command === "add"){
-    let today = new Date();  //source: https://stackoverflow.com/questions/1531093/how-do-i-get-the-current-date-in-javascript
-    let dd = String(today.getDate()).padStart(2, '0');
-    let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    let yyyy = today.getFullYear();
+  if (COMMAND === "add"){
 
-    today = dd + '/' + mm + '/' + yyyy;
+      let text = "INSERT INTO items (completion, name, created_at, updated_at) VALUES ($1, $2, $3, $4) RETURNING *";
 
-      let text = "INSERT INTO (completion, name, created_at, updated_at) VALUES ($1, $2, $3, $4)";
-
-      let values =["[]", activity, today,"[]"]; //user should insert new item in quotes
+      let values =["[]", ACTIVITY, today,"[]"]; //user should insert new item in quotes
 
       client.query(text, values, queryDoneCallback);
   }
 
-  if(command === "delete"){
+  if(COMMAND === "delete"){
 
-      let text = "DELETE FROM items WHERE name=$1 RETURNING *";
+      let text = "DELETE FROM items WHERE id=$1 RETURNING *";
 
-      let values = [activity];
+      let values = [ACTIVITY];
 
       client.query(text, values, queryDoneCallback);
+  }
+
+  if(COMMAND == "done"){
+
+    let text = "UPDATE items SET completion=$1, updated_at=$2 WHERE id=$3 RETURNING *";
+
+    let values = ["[x]", today, ACTIVITY];
+
+    client.query(text, values, queryDoneCallback);
+  }
+
+  if(COMMAND == "undone"){
+
+    let text = "UPDATE items SET completion=$1 WHERE id=$2 RETURNING *";
+
+    let values = ["[]", ACTIVITY];
+
+    client.query(text, values, queryDoneCallback);
   }
 
 // let clientConnectionCallback = (err) => {
