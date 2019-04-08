@@ -16,33 +16,29 @@ const client = new pg.Client(configs);
 
 //==================ADD ITEM======================//
 
-// if (process.argv[2] === "add") {
+if (process.argv[2] === "add") {
 
-//     const onQueryFinished = (err, result) => {
-//         if (err) {
-//           console.log("query error", err.message);
-//         } else {
-//         //   for( let i=0; i<result.rows.length; i++ ){
-//         //     console.log("result: ", result.rows[i].name);
-//         //   }
-//         // }
-//     };
+    const onQueryFinished = (err, result) => {
+        if (err) {
+          console.log("query error", err.message);
+        }
+    };
 
-//     const onConnectServer = (err) => {
+    const onConnectServer = (err) => {
 
-//         if( err ){
-//             console.log( "error", err.message );
-//         }
+        if( err ){
+            console.log( "error", err.message );
+        }
 
-//         let text = `INSERT INTO todoItems (item, done) VALUES ('${input}', false)`;
+        let text = `INSERT INTO todoItems (item, done) VALUES ('${input}', false)`;
 
-//         client.query(text, onQueryFinished);
+        client.query(text, onQueryFinished);
 
-//     };
+    };
 
-//     client.connect(onConnectServer);
+    client.connect(onConnectServer);
 
-// }
+}
 
 //=================SHOW ITEMS=====================//
 
@@ -63,7 +59,7 @@ if (process.argv[2] === "show") {
                 boxDisplay = "[x]";
             }
 
-            console.log((i+1) + ". " + boxDisplay + " – " + result.rows[i].item);
+            console.log(result.rows[i].id + ". " + boxDisplay + " – " + result.rows[i].item);
           }
         }
     };
@@ -74,7 +70,47 @@ if (process.argv[2] === "show") {
             console.log( "error", err.message );
         }
 
-        let text = "SELECT item, done FROM todoItems";
+        let text = "SELECT item, done, id FROM todoItems";
+
+        client.query(text, onQueryFinished);
+
+    };
+
+    client.connect(onConnectServer);
+
+}
+
+//============COMPLETE (MARK AS DONE)=============//
+
+if (process.argv[2] === "done") {
+
+    let boxDisplay = "";
+
+    const onQueryFinished = (err, result) => {
+        if (err) {
+          console.log("query error", err.message);
+        } else {
+
+          for( let i=0; i<result.rows.length; i++ ){
+
+            if (result.rows[i].done === false) {
+                boxDisplay = "[ ]";
+            } else {
+                boxDisplay = "[x]";
+            }
+
+            console.log(result.rows[i].id + ". " + boxDisplay + " – " + result.rows[i].item);
+          }
+        }
+    };
+
+    const onConnectServer = (err) => {
+
+        if( err ){
+            console.log( "error", err.message );
+        }
+
+        let text = `UPDATE todoItems SET done=true WHERE id=${input}`;
 
         client.query(text, onQueryFinished);
 
