@@ -1,5 +1,5 @@
 // console.log("works!!", process.argv[2]);
-
+//#!/usr/bin/env node
 const pg = require('pg');
 
 const configs = {
@@ -91,6 +91,14 @@ let clientConnectionCallback = (err) => {
     client.query(text, values, queryDoneCallback);
   }
 
+  if(COMMAND == "help"){
+    console.log("show: displays the items db");
+    console.log("add_space_'activity_name': creates a new row in db with activity name");
+    console.log("done_space_idNumber: assigns a cross to that row signifying completion");
+    console.log("undone_space_idNumber: removes cross that was previously assigned");
+    console.log("delete_space_idNumber: removes that row from the db");
+  }
+
 // let clientConnectionCallback = (err) => {
 //
 //   if( err ){
@@ -99,8 +107,8 @@ let clientConnectionCallback = (err) => {
 //
 //   let text = "INSERT INTO items (name) VALUES ($1) RETURNING id";
 //
-//   // const values = ["hello"];
-//   const values = ["process.argv[2]"];
+/* // const values = ["hello"];
+//   const values = ["process.argv[2]"]; */
 //
 //   client.query(text, values, queryDoneCallback);
 // };
