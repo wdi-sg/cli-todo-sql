@@ -3,7 +3,7 @@ console.log("works!!", process.argv[2]);
 const pg = require('pg');
 
 const configs = {
-    user: 'akira',
+    user: 'cena999', password: 'cena999',
     host: '127.0.0.1',
     database: 'todo',
     port: 5432,
