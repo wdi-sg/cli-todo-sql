@@ -70,6 +70,8 @@ var executeWriteQuery = function (sqlQuery, values) {
 // Function
 //===================================
 var showTasks = async function () {
+    let sqlQuery = 'SELECT * FROM items';
+
     client.connectAsync()
         .then( () => {
             client.queryAsync(sqlQuery)
