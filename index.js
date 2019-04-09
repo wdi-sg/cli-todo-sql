@@ -1,14 +1,14 @@
 console.log("works!!", process.argv[2]);
 
 const pg = require('pg');
-
+const input = process.argv;
 const configs = {
-    user: 'akira',
+    user: 'andrew',
     host: '127.0.0.1',
     database: 'todo',
     port: 5432,
 };
-
+//==================================//
 const client = new pg.Client(configs);
 
 let queryDoneCallback = (err, result) => {
@@ -19,17 +19,27 @@ let queryDoneCallback = (err, result) => {
     }
 };
 
-let clientConnectionCallback = (err) => {
-
+//==================================//
+    // Show entire to do list //
+//==================================//
+const show = (err)=> {
   if( err ){
     console.log( "error", err.message );
   }
 
-  let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
+let queryText = 'SELECT * FROM todo';
 
-  const values = ["hello"];
-
-  client.query(text, values, queryDoneCallback);
+client.query(queryText, (err, res) => {
+    if (err) {
+      console.log("query error", err.message);
+    } else {
+      // iterate through all of your results:
+      for( let i=0; i<res.rows.length; i++ ){
+        console.log("result: ", res.rows[i]);
+          }
+        }
+    });
 };
 
-client.connect(clientConnectionCallback);
+//this means that it will occur immediately upon connection
+client.connect(show);
