@@ -63,14 +63,28 @@ let showTasks = ()=>{
 //ASSIGN DONE WITH TASK
 let doneWithTask = (itemId) =>{
     let id = itemId;
-    client.connect(markTheTask = () =>{
-        let text = `UPDATE items SET done=true WHERE id = ${id}`;
+    const now = new Date()
+    client.connect(() =>{
+        let text = `UPDATE items SET done=true WHERE id = ${id};
+                    UPDATE items SET updated_at=${now} WHERE id = ${id};`
         client.query(text, actionCompleted);
     });
 }
 
+//DELETE TASK PERMENENTLY
+let deleteTask = (itemId) =>{
+    let id = itemId;
+    client.connect(()=>{
+        let text =`DELETE FROM items WHERE id = ${id}`;
+        client.query(text,actionCompleted);
+    })
+}
+
+
+////**********SYSTEMFUNCTIONS ***********//
+
 //JUST IN CASE
-let deleteTable = () => {
+let dropTable = () => {
     client.connect(markTheTask =() =>{
         let text = `DROP TABLE items`;
         client.query(text,actionCompleted);
@@ -84,7 +98,8 @@ let createTable = () =>{
                     id SERIAL PRIMARY KEY,
                     task text,
                     done BOOLEAN,
-                    created_at TIMESTAMP
+                    created_at TIMESTAMP,
+                    updated_at TIMESTAMP
                     );`
         client.query(text,actionCompleted);
     })
@@ -119,7 +134,7 @@ var main = function(userCommand, userInput){
         break;
     //clear table. create table. set boolean column.
         case "clear":
-        deleteTable();
+        dropTable();
         break;
 
         case "create":
