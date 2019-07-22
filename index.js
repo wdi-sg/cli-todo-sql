@@ -28,11 +28,12 @@ Your list of items to do:
                 `);
 
             result.rows.forEach((item, index) => {
-                if (item.completed) {
-                    console.log(`${index+1}. [X] - ${item.name}`);
-                } else {
-                    console.log(`${index+1}. [ ] - ${item.name}`);
-                }
+                let date = item.created_at.getDate();
+                let month = item.created_at.getMonth();
+                let year = item.created_at.getFullYear();
+                // console.log(typeof date);
+                let symbol = item.completed ? "X" : " ";
+                console.log(`${index+1}. [${symbol}] - ${item.name}\n   created on: ${date}/${month}/${year}`);
             });
 
             process.exit();
