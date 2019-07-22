@@ -1,15 +1,16 @@
-console.log("works!!", process.argv[2]);
+console.log("ACTION:", process.argv[2].toUpperCase());
 
 const pg = require('pg');
 
 const configs = {
-    user: 'akira',
+    user: 'admin',
     host: '127.0.0.1',
     database: 'todo',
     port: 5432,
 };
 
 const client = new pg.Client(configs);
+
 
 let queryDoneCallback = (err, result) => {
     if (err) {
@@ -25,11 +26,32 @@ let clientConnectionCallback = (err) => {
     console.log( "error", err.message );
   }
 
-  let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
+  if (process.argv[2] === "add"){
+    let text = "INSERT INTO todo (name, status) VALUES ($1, $2) RETURNING id";
+    const values = [process.argv[3], '[ ]'];
+    client.query(text, values, queryDoneCallback);
+  }
 
-  const values = ["hello"];
+  else if (process.argv[2] === "show"){
+    let text = "SELECT * FROM todo ORDER BY id ASC";
+    client.query(text, queryDoneCallback);
+  }
 
-  client.query(text, values, queryDoneCallback);
+  else if (process.argv[2] === "delete"){
+    let text = `DELETE FROM todo where id = ${process.argv[3]} RETURNING id`;
+    let dropId = 'ALTER TABLE todo DROP id';
+    let addId = 'ALTER TABLE todo ADD id SERIAL PRIMARY KEY';
+
+    client.query(text, queryDoneCallback);
+    client.query(dropId, queryDoneCallback);
+    client.query(addId, queryDoneCallback);
+  }
+
+  else if (process.argv[2] === "done"){
+    let text = `UPDATE todo SET status = '[X]' WHERE id = ${process.argv[3]} RETURNING id`;
+    client.query(text, queryDoneCallback);
+  }
 };
+
 
 client.connect(clientConnectionCallback);
