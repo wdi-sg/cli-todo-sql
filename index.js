@@ -1,3 +1,7 @@
+//include commander node module
+const program = require('commander');
+program.version('0.0.1');
+
 // Postgres database
 const pg = require('pg');
 const configs = {
@@ -216,27 +220,13 @@ const asciiText = (string) => {
 if (!userCommand) {
     showInstructions();
 }
-else {
-    userCommand = userCommand.toLowerCase();
-    // check what command the user have entered
-    switch (userCommand) {
-        case "add" :
-            addItem();
-            break;
-        case "show" :
-            showItem();
-            break;
-        case "check" :
-            checkDone();
-            break;
-        case "uncheck" :
-            uncheckDone();
-            break;
-        case "delete" :
-            deleteItem();
-            break;
-        default:
-            console.log("Please key in a valid command.");
-            break;
-    }
-}
+//setting program options
+program
+    .option('-a, --add <item>', 'add item to todo list', addItem)
+    .option('-s, --show', 'show todo list', showItem)
+    .option('-c, --check <item>', 'check item as done', checkDone)
+    .option('-u, --uncheck <item>', 'check item as done', uncheckDone)
+    .option('-d, --delete <item>', 'delete item from todo list', deleteItem);
+
+//let commander program process the user's input
+program.parse(process.argv);
