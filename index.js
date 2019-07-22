@@ -22,6 +22,7 @@ let input3 = [process.argv[3]];
 let SHOW_TASKS = 'SELECT * FROM todolist';
 let ADD_TASK = 'INSERT INTO todolist (done, task) VALUES ($1, $2)';
 const values = ['[ ]', input3]; //create a new variable when inserting more than one value
+let UPDATE_DONE = "UPDATE todolist SET done='[X]' WHERE id=" + input3;
 
 let queryDoneCallback = (err, result) => { //
     if (err) {
@@ -41,6 +42,9 @@ let clientConnectionCallback = () => {
         case "add":
         client.query(ADD_TASK, values, queryDoneCallback);
         break;
+
+        case "done":
+        client.query(UPDATE_DONE, queryDoneCallback);
     }
 }
 
