@@ -1,12 +1,17 @@
-console.log("works!!", process.argv[2]);
+// console.log("works!!", process.argv[2] , process.argv[3]);
+
+var inputOne = process.argv[2];
+// console.log("This is in input One: " + inputOne);
+var inputTwo = process.argv[3];
+// console.log("This is in input Two: " + inputTwo);
 
 const pg = require('pg');
 
 const configs = {
-    user: 'akira',
+    user: 'mohammadasshikin',
     host: '127.0.0.1',
     database: 'todo',
-    port: 5432,
+    port: 5432
 };
 
 const client = new pg.Client(configs);
@@ -14,22 +19,96 @@ const client = new pg.Client(configs);
 let queryDoneCallback = (err, result) => {
     if (err) {
       console.log("query error", err.message);
-    } else {
-      console.log("result", result.rows );
+    }
+    else {
+      // console.log("result", result.rows );
+        for( let i=0; i<result.rows.length; i++ ){
+            console.log(`${result.rows[i].id}. ${result.rows[i].action} - ${result.rows[i].task} created on: ${result.rows[i].timestamptz_col}`);
+        }
     }
 };
 
-let clientConnectionCallback = (err) => {
+let show = (err)=>{
+    if(err){
+        console.log("error", err.message);
+    }
+
+    let text = "SELECT * FROM clitodo";
+
+    client.query(text,queryDoneCallback);
+};
+
+
+let add = (err) => {
 
   if( err ){
     console.log( "error", err.message );
   }
 
-  let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
+  let text = "INSERT INTO clitodo (action, task) VALUES ($1, $2) RETURNING *";
 
-  const values = ["hello"];
+  const values = ["[ ]", inputTwo];
 
   client.query(text, values, queryDoneCallback);
 };
 
-client.connect(clientConnectionCallback);
+
+
+let done = (err)=>{
+    if(err){
+        console.log("error", err.message );
+    }
+    //let text = "UPDATE clitodo SET task='[x]' WHERE id = '" + "';
+    let text = `UPDATE clitodo SET action ='[x]' WHERE id = '${inputTwo}'`;
+
+    client.query(text,queryDoneCallback);
+};
+
+
+let remove = (err)=>{
+    if(err){
+        console.log("error", err.message);
+    }
+
+    let text = `DELETE from clitodo WHERE id = '${inputTwo}'`;
+    let dropId = 'ALTER TABLE clitodo DROP id';
+    let addId = 'ALTER TABLE clitodo ADD id SERIAL PRIMARY KEY';
+    client.query(text);
+    client.query(dropId);
+    client.query(addId,queryDoneCallback);
+
+}
+
+
+var start = (input)=>{
+    if(input === "add"){
+        client.connect(add);
+    }
+    else if(input === "done"){
+        client.connect(done);
+    }
+    else if(input === "remove"){
+        client.connect(remove);
+    }
+    else{
+        console.log(`
+
+ ▄▄▄▄▄▄▄▄▄▄▄  ▄            ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄   ▄▄▄▄▄▄▄▄▄▄▄  ▄            ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄
+▐░░░░░░░░░░░▌▐░▌          ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░▌ ▐░░░░░░░░░░░▌▐░▌          ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌
+▐░█▀▀▀▀▀▀▀▀▀ ▐░▌           ▀▀▀▀█░█▀▀▀▀  ▀▀▀▀█░█▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌▐░█▀▀▀▀▀▀▀█░▌▐░█▀▀▀▀▀▀▀█░▌▐░▌           ▀▀▀▀█░█▀▀▀▀ ▐░█▀▀▀▀▀▀▀▀▀  ▀▀▀▀█░█▀▀▀▀
+▐░▌          ▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌       ▐░▌▐░▌               ▐░▌     ▐░▌               ▐░▌
+▐░▌          ▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌       ▐░▌▐░▌               ▐░▌     ▐░█▄▄▄▄▄▄▄▄▄      ▐░▌
+▐░▌          ▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌       ▐░▌▐░▌               ▐░▌     ▐░░░░░░░░░░░▌     ▐░▌
+▐░▌          ▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌       ▐░▌▐░▌               ▐░▌      ▀▀▀▀▀▀▀▀▀█░▌     ▐░▌
+▐░▌          ▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌       ▐░▌▐░▌               ▐░▌               ▐░▌     ▐░▌
+▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄▄▄  ▄▄▄▄█░█▄▄▄▄      ▐░▌     ▐░█▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄▄▄  ▄▄▄▄█░█▄▄▄▄  ▄▄▄▄▄▄▄▄▄█░▌     ▐░▌
+▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌     ▐░▌     ▐░░░░░░░░░░░▌▐░░░░░░░░░░▌ ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌     ▐░▌
+ ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀       ▀       ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀   ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀       ▀
+
+
+`)
+        client.connect(show);
+    }
+}
+
+start(inputOne);
