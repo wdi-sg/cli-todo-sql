@@ -1,9 +1,10 @@
-console.log("works!!", process.argv[2]);
-
 const pg = require('pg');
 
+var commandType = process.argv[2];
+var userInput  = process.argv[3];
+
 const configs = {
-    user: 'akira',
+    user: 'yixin',
     host: '127.0.0.1',
     database: 'todo',
     port: 5432,
@@ -11,25 +12,152 @@ const configs = {
 
 const client = new pg.Client(configs);
 
-let queryDoneCallback = (err, result) => {
+
+//Show list
+const show = function() {
+
+    let sqlQuery = "SELECT * FROM items ORDER BY id ASC;";
+    client.query(sqlQuery, (error, result) => {
+        if (error) {
+            console.log("query error", error.message);
+        } else {
+          var tasks = result.rows;
+          for (var i = 0; i < tasks.length; i++){
+            if (tasks[i].done  === true){
+              console.log((i+1) + ". "+ "[x] " + tasks[i].task + "   " + tasks[i].updated_at);
+            } else {
+              console.log((i+1) + ". "+ "[ ] " + tasks[i].task + "   " + tasks[i].updated_at);
+            }
+          }
+            process.exit();
+        }
+    });
+}
+
+
+//Add item
+const add = function(newTask) {
+
+    let sqlQuery = "INSERT INTO items (task, done, created_at, updated_at) VALUES ($1, $2, $3, $4)";
+    let values= [newTask, false, '', ''];
+    client.query(sqlQuery, values, (error, result) => {
+        if (error) {
+            console.log("query error", error.message);
+        } else {
+            console.log(`Added Task`);
+            process.exit();
+        }
+    });
+}
+
+
+//Mark Done
+const markDone = function(id) {
+    id = parseInt(id);
+
+    let sqlQuery = "UPDATE items SET done = $2, updated_at = $3 WHERE id = $1";
+    let values= [id, true, ''];
+
+    client.query(sqlQuery, values, (error, result) => {
+        if (error) {
+            console.log("query error", error.message);
+        } else {
+            console.log(`Marked Done`);
+            process.exit();
+        }
+    });
+}
+
+//Mark Undone
+const markUndone = function(id) {
+    id = parseInt(id);
+
+    let sqlQuery = "UPDATE items SET done = $2, updated_at = $3 WHERE id = $1";
+    let values= [id, false, ''];
+
+    client.query(sqlQuery, values, (error, result) => {
+        if (error) {
+            console.log("query error", error.message);
+        } else {
+            console.log(`Marked Undone`);
+            process.exit();
+        }
+    });
+}
+
+//Delete Task
+const deleteTask = function(id) {
+    id = parseInt(id);
+
+    let sqlQuery = "DELETE FROM items WHERE id = $1";
+    let values= [id];
+
+    client.query(sqlQuery, values, (error, result) => {
+        if (error) {
+            console.log("query error", error.message);
+        } else {
+            console.log(`Deleted`);
+            process.exit();
+        }
+    });
+}
+
+
+client.connect((err) => {
+
+  var commandType = process.argv[2];
+  var userInput  = process.argv[3];
+
     if (err) {
-      console.log("query error", err.message);
+        console.log("error", err.message);
     } else {
-      console.log("result", result.rows );
+
+      switch (commandType) {
+          case "show":
+              show();
+              break;
+
+          case "add":
+              add(userInput);
+              break;
+
+          case "done":
+              markDone(userInput);
+              break;
+
+          case "undo ":
+              markUndone(userInput);
+              break;
+
+          case "delete":
+              deleteTask(userInput);
+              break;
+
+          default:
+              instructions();
+              break;
+      }
+
+
     }
-};
 
-let clientConnectionCallback = (err) => {
+});
 
-  if( err ){
-    console.log( "error", err.message );
-  }
-
-  let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
-
-  const values = ["hello"];
-
-  client.query(text, values, queryDoneCallback);
-};
-
-client.connect(clientConnectionCallback);
+//Intructions
+const instructions = function() {
+    console.log(`
+      ████████╗ ██████╗     ██████╗  ██████╗     ██╗     ██╗███████╗████████╗
+      ╚══██╔══╝██╔═══██╗    ██╔══██╗██╔═══██╗    ██║     ██║██╔════╝╚══██╔══╝
+         ██║   ██║   ██║    ██║  ██║██║   ██║    ██║     ██║███████╗   ██║
+         ██║   ██║   ██║    ██║  ██║██║   ██║    ██║     ██║╚════██║   ██║
+         ██║   ╚██████╔╝    ██████╔╝╚██████╔╝    ███████╗██║███████║   ██║
+         ╚═╝    ╚═════╝     ╚═════╝  ╚═════╝     ╚══════╝╚═╝╚══════╝   ╚═╝
+         `);
+    console.log("Instructions");
+    console.log("$ node index.js show            -  to show the to do list");
+    console.log("$ node index.js add 'new task'  -  to add a new task");
+    console.log("$ node index.js done 1          -  to mark task 1 done");
+    console.log("$ node index.js undo 1          -  to mark task 1 not done");
+    console.log("$ node index.js delete 1        -  to delete task 1");
+    process.exit();
+}
