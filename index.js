@@ -1,5 +1,4 @@
-//in case u forgot process.argv
-// console.log("works!!", process.argv[2]);
+
 let command = process.argv[2];
 let taskName = process.argv[3];
 
@@ -14,7 +13,25 @@ const configs = {
 };
 const client = new pg.Client(configs);
 
-/* === Set variables based on queries  === */
+/* === Helper Functions === */
+
+let show = () => {
+    const text = 'SELECT * FROM todo';
+    client.query(text, (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            for (i=0; i < result.rows.length; i++) {
+                if (result.rows[i].status === true) {
+                    console.log (`${result.rows[i].id}.[ X ] - ${result.rows[i].task} \n Date Created: ${result.rows[i].created_at} \n Status: ${result.rows[i].status}`);
+                } else if (result.rows[i].status === false) {
+                    console.log (`${result.rows[i].id}.[] - ${result.rows[i].task} \n Date Created: ${result.rows[i].created_at} \n Status: ${result.rows[i].status}`);
+                }
+            }
+            process.exit();
+        }
+    })
+};
 
 //callback function that runs when client is connected
 let clientConnectionCallback = (err) => {
@@ -23,53 +40,16 @@ let clientConnectionCallback = (err) => {
   }
 
   else if (command === 'show') {
-    const text = 'SELECT * FROM todo';
-    client.query(text, showFunction);
+    show();
   } else if (command === 'add') {
-    const text = INSERT INTO todo
-    (task, status)
-    VALUES
-    (taskName, 'false');
-    client.query(text, addFunction);
+    const text = "INSERT INTO todo (task, status) VALUES ($1, $2)";
+    let values = [taskName, false];
+    client.query(text, values, show);
+  } else if (command === 'done') {
+    //find the result.row.status and change it to true
+
   }
 };
-
-/* === Helper Functions === */
-showFunction = (err, result) => {
-    if (err) {
-        console.log(err);
-    } else {
-        for (i=0; i < result.rows.length; i++) {
-            console.log (`${result.rows[i].id}. ${result.rows[i].task} \n Date Created: ${result.rows[i].created_at} \n Status: ${result.rows[i].status}`);
-        }
-        process.exit();
-    }
-};
-
-addFunction = (err, result) => {
-    if (err) {
-        console.log(err);
-    } else {
-        //show the updated list
-        console.log(SELECT id, task, status FROM todo);
-    }
-        process.exit();
-};
-
-
-//   let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
-//   const values = ["hello"]
-//   client.query(text, values, queryDoneCallback);
-
-//   let queryDoneCallback = (err, result) => {
-//     if (err) {
-//       console.log("query error", err.message);
-//     } else {
-//       console.log("RESULT:");
-//       console.log(result);
-//       process.exit();
-//     }
-// };
 
 //once connected, run the callback function
 client.connect(clientConnectionCallback);
