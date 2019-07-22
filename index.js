@@ -9,10 +9,22 @@ const configs = {
     port: 5432,
 };
 
+const client = new pg.Client(configs);
+
+
 const commandType = process.argv[2];
 const userInput = process.argv[3];
 
-const client = new pg.Client(configs);
+const welcome = "\nWelcome to your Todo List.";
+
+const commandsList = `
+Commands available:
+
+show : shows current todo list           [ node index.js show             ]
+add  : creates new list items            [ node index.js add "boil water" ]
+done : toggle list item as completed     [ node index.js done 2           ]
+del  : deletes list item                 [ node index.js del  1           ]
+`;
 
 // function declarations
 const show = () => {
@@ -22,20 +34,22 @@ const show = () => {
     client.query(queryString, (err, result) => {
         if (err) {
           console.log("query error", err.message);
-        } else {
+        }
+        else if (!result.rows[0]) {
+            console.log("\nYour list is empty!");
+            console.log('\nTo add new todo items eg. boil water: [ node index.js add "boil water" ]');
+            process.exit();
+        }else {
             console.log(`
 Your list of items to do:
                 `);
 
             result.rows.forEach((item, index) => {
-                let date = item.created_at.getDate();
-                let month = item.created_at.getMonth();
-                let year = item.created_at.getFullYear();
-                // console.log(typeof date);
+                let date = `${item.created_at.getDate()} ${item.created_at.toLocaleString('default', { month: 'short' })} ${item.created_at.getFullYear()}`;
                 let symbol = item.completed ? "X" : " ";
-                console.log(`${index+1}. [${symbol}] - ${item.name}\n   created on: ${date}/${month}/${year}`);
+                let status = item.updated_at ? `${item.updated_at.getDate()} ${item.updated_at.toLocaleString('default', { month: 'short' })} ${item.updated_at.getFullYear()}` : "pending";
+                console.log(`${index+1}. [${symbol}] - ${item.name}\n   created on: ${date}\n    completed: ${status}`);
             });
-
             process.exit();
         }
     });
@@ -65,40 +79,53 @@ const done = () => {
         } else {
             let arrayIndex = (parseInt(userInput)-1);
             let item = result.rows[arrayIndex];
-            let action = !item.completed;
 
-            queryString = "update items set completed="+ action +" where id="+item.id;
+            if (item) {
+                let action = !item.completed;
+                let date = action ? new Date() : null;
 
-            client.query(queryString, (err, result) => {
-                if (err) {
-                    console.log("query error", err.message);
-                } else {
-                    show();
-                }
-            });
+                queryString = "update items set updated_at=($1), completed=($2) where id=($3)";
+                let values = [date, action, item.id];
+
+                client.query(queryString, values, (err, result) => {
+                    if (err) {
+                        console.log("query error", err.message);
+                    } else {
+                        show();
+                    }
+                });
+            } else {
+                console.log("Please input the correct id number!");
+                process.exit();
+            }
         }
     })
 }
 
 const del = () => {
-    let queryString = "select id from items";
+    let queryString = "select id from items order by id";
 
     client.query(queryString, (err, result) => {
         if (err) {
             console.log("query error", err.message);
         } else {
             let arrayIndex = (parseInt(userInput)-1);
-            let actualIndex = result.rows[arrayIndex].id;
+            if (result.rows[arrayIndex]) {
+                let actualId = result.rows[arrayIndex].id;
 
-            queryString = "delete from items where id="+actualIndex;
+                queryString = "delete from items where id="+actualId;
 
-            client.query(queryString, (err, result) => {
-                if (err) {
-                    console.log("query error", err.message);
-                } else {
-                    show();
-                }
-            });
+                client.query(queryString, (err, result) => {
+                    if (err) {
+                        console.log("query error", err.message);
+                    } else {
+                        show();
+                    }
+                });
+            } else {
+                console.log("Please input the correct id number!");
+                process.exit();
+            }
         }
     })
 }
@@ -122,17 +149,9 @@ client.connect((err)=>{
                 del();
                 break;
             default:
-                    console.log(`
-Welcome to your Todo List.
-
-Commands available:
-
-show : shows current todo list           [ node index.js show             ]
-add  : creates new list items            [ node index.js add "boil water" ]
-done : toggle list item as completed     [ node index.js done 2           ]
-del  : deletes list item                 [ node index.js del  1           ]
-`);
-                    process.exit();
+                console.log(welcome);
+                console.log(commandsList);
+                process.exit();
         }
     }
 });
