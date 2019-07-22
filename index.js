@@ -10,18 +10,18 @@ const configs = {
 };
 
 const client = new pg.Client(configs);
-//------------------SET UP COMPLETE----------------//
-
-
 
 //-------------------SET UP FUNCTION --------------//
 
 let input2 = process.argv[2];
 let input3 = [process.argv[3]];
+
+
+
+// let check = process.argv[4];
 let SHOW_TASKS = 'SELECT * FROM todolist';
 let ADD_TASK = 'INSERT INTO todolist (done, task) VALUES ($1, $2)';
-
-
+const values = ['[ ]', input3]; //create a new variable when inserting more than one value
 
 let queryDoneCallback = (err, result) => { //
     if (err) {
@@ -39,45 +39,9 @@ let clientConnectionCallback = () => {
         break;
 
         case "add":
-        client.query(ADD_TASK, input3, queryDoneCallback);
+        client.query(ADD_TASK, values, queryDoneCallback);
         break;
-
     }
 }
 
 client.connect(clientConnectionCallback);// inside can be function
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// //-------------------------------------------//
-// let queryDoneCallback = (err, result) => { //
-//     if (err) {
-//       console.log("query error", err.message);
-//     } else {
-//       console.log("result", result.rows );
-//     }
-
-// };
-
-
-
-
-  // const values = ["hello"];
-
-  // client.query(text, values, queryDoneCallback);
