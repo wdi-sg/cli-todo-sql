@@ -52,8 +52,10 @@ let clientConnectionCallback = (err) => {
                 }
             });
         } else if (commandType === "done"){
-            let text = 'UPDATE items SET Done=true WHERE id = ($1)';
-            let sub = [itemList];
+            let text = 'UPDATE items SET Done=true, updated=($1) WHERE id = ($2)';
+            const now = new Date()
+            let datenow = [now];
+            let sub = [datenow, itemList];
             client.query(text, sub, function (err, res) {
                 if (err) throw err;
                 console.log(res.affectedRows + " record(s) updated");
@@ -66,10 +68,6 @@ let clientConnectionCallback = (err) => {
                 console.log("The records have been updated");
               });
         }
-
-        /*let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
-        const values = ["hello"];
-        client.query(text, values, queryDoneCallback);*/
   }
 
 
