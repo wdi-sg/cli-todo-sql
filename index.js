@@ -23,7 +23,7 @@ let queryDoneCallback = (err, result) => {
     else {
       // console.log("result", result.rows );
         for( let i=0; i<result.rows.length; i++ ){
-            console.log(`${result.rows[i].id}. ${result.rows[i].action} - ${result.rows[i].task} created on: ${result.rows[i].timestamptz_col}`);
+            console.log(`${result.rows[i].id}. ${result.rows[i].action} - ${result.rows[i].task} created on: ${result.rows[i].created_at} updated on: ${result.rows[i].updated_at}`);
         }
     }
 };
@@ -33,9 +33,25 @@ let show = (err)=>{
         console.log("error", err.message);
     }
 
-    let text = "SELECT * FROM clitodo";
+    let text = "SELECT * FROM clitodo order by id";
 
     client.query(text,queryDoneCallback);
+    console.log(`
+
+ ▄▄▄▄▄▄▄▄▄▄▄  ▄            ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄   ▄▄▄▄▄▄▄▄▄▄▄  ▄            ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄
+▐░░░░░░░░░░░▌▐░▌          ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░▌ ▐░░░░░░░░░░░▌▐░▌          ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌
+▐░█▀▀▀▀▀▀▀▀▀ ▐░▌           ▀▀▀▀█░█▀▀▀▀  ▀▀▀▀█░█▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌▐░█▀▀▀▀▀▀▀█░▌▐░█▀▀▀▀▀▀▀█░▌▐░▌           ▀▀▀▀█░█▀▀▀▀ ▐░█▀▀▀▀▀▀▀▀▀  ▀▀▀▀█░█▀▀▀▀
+▐░▌          ▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌       ▐░▌▐░▌               ▐░▌     ▐░▌               ▐░▌
+▐░▌          ▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌       ▐░▌▐░▌               ▐░▌     ▐░█▄▄▄▄▄▄▄▄▄      ▐░▌
+▐░▌          ▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌       ▐░▌▐░▌               ▐░▌     ▐░░░░░░░░░░░▌     ▐░▌
+▐░▌          ▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌       ▐░▌▐░▌               ▐░▌      ▀▀▀▀▀▀▀▀▀█░▌     ▐░▌
+▐░▌          ▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌       ▐░▌▐░▌               ▐░▌               ▐░▌     ▐░▌
+▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄▄▄  ▄▄▄▄█░█▄▄▄▄      ▐░▌     ▐░█▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄▄▄  ▄▄▄▄█░█▄▄▄▄  ▄▄▄▄▄▄▄▄▄█░▌     ▐░▌
+▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌     ▐░▌     ▐░░░░░░░░░░░▌▐░░░░░░░░░░▌ ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌     ▐░▌
+ ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀       ▀       ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀   ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀       ▀
+
+
+`)
 };
 
 
@@ -49,7 +65,7 @@ let add = (err) => {
 
   const values = ["[ ]", inputTwo];
 
-  client.query(text, values, queryDoneCallback);
+  client.query(text, values, show);
 };
 
 
@@ -60,8 +76,7 @@ let done = (err)=>{
     }
     //let text = "UPDATE clitodo SET task='[x]' WHERE id = '" + "';
     let text = `UPDATE clitodo SET action ='[x]' WHERE id = '${inputTwo}'`;
-
-    client.query(text,queryDoneCallback);
+    client.query(text, show);
 };
 
 
@@ -75,7 +90,7 @@ let remove = (err)=>{
     let addId = 'ALTER TABLE clitodo ADD id SERIAL PRIMARY KEY';
     client.query(text);
     client.query(dropId);
-    client.query(addId,queryDoneCallback);
+    client.query(addId, show);
 
 }
 
@@ -107,6 +122,10 @@ var start = (input)=>{
 
 
 `)
+        console.log("node index.js add '_ _ _' - to add new item list");
+        console.log("node index.js done 'id' - to note done in list");
+        console.log("node index.js remove 'id' - to remove item in list");
+        console.log("/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////")
         client.connect(show);
     }
 }
