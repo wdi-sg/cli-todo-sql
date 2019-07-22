@@ -15,7 +15,17 @@ const client = new pg.Client(configs);
 const commandType = process.argv[2];
 const userInput = process.argv[3];
 
-const welcome = "\nWelcome to your Todo List.";
+const figlet = require('figlet');
+
+let welcome = "\nWelcome to your Todo List.";
+
+figlet('Done?', {
+    font: 'Big Money-ne',
+    horizontalLayout: 'default',
+    verticalLayout: 'default'
+}, (err, data) => {
+    welcome = data;
+});
 
 const commandsList = `
 Commands available:
@@ -149,6 +159,7 @@ client.connect((err)=>{
                 del();
                 break;
             default:
+                console.log();
                 console.log(welcome);
                 console.log(commandsList);
                 process.exit();
