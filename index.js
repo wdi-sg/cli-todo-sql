@@ -8,6 +8,8 @@ const configs = {
 };
 const client = new pg.Client(configs);
 
+const figlet = require('figlet');
+
 //store user command
 let userCommand = process.argv[2];
 
@@ -31,7 +33,8 @@ const addItem = () => {
                 if (err) {
                     console.log("ERROR: " + err);
                 }
-                console.log(`${res.rows[0].name} have been added to the todo list on ${res.rows[0].created_at}`);
+                asciiText("Added!");
+                console.log(`'${res.rows[0].name}' have been added to the todo list on ${res.rows[0].created_at}`);
             })
         }
     });
@@ -47,14 +50,20 @@ const showItem = () => {
                 if (err) {
                     console.log("ERROR: " + err);
                 }
-                res.rows.map((row,i) => {
-                    if (row.updated_at === "") {
-                        console.log(`${i + 1}. ${row.checked} – ${row.name} (created on ${row.created_at})`);
-                    } else {
-                        //create date object from item date info
-                        console.log(`${i + 1}. ${row.checked} – ${row.name} (updated on ${row.updated_at})`);
-                    }
-                });
+                asciiText("To-Do List");
+                if (res.rows.length === 0){
+                    console.log("There are no items in the todo list.");
+                }
+                else {
+                    res.rows.map((row, i) => {
+                        if (row.updated_at === "") {
+                            console.log(`${i + 1}. ${row.checked} – ${row.name} (created on ${row.created_at})`);
+                        } else {
+                            //create date object from item date info
+                            console.log(`${i + 1}. ${row.checked} – ${row.name} (updated on ${row.updated_at})`);
+                        }
+                    });
+                }
             })
         }
     });
@@ -64,6 +73,7 @@ const showItem = () => {
 const checkDone = () => {
     let userInput = parseInt(process.argv[3]);
     if (Number.isNaN(userInput)){
+        asciiText("Oh no!");
         console.log("Please key in a valid number.");
     }
     else {
@@ -76,21 +86,27 @@ const checkDone = () => {
                     if (err) {
                         console.log("ERROR: " + err);
                     }
-                    let selectedName = res.rows[userInput-1].name;
-                    if (res.rows[userInput-1].checked === '[x]') {
-                        console.log(`'${selectedName}' have already been checked as done.`);
+                    if (userInput-1 > res.rows.length ) {
+                        asciiText("Oh no!");
+                        console.log("Please key in a valid item number.");
                     }
-                    else {
-                        const date = new Date();
-                        const currentDate = date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear();
+                    else{
+                        let selectedName = res.rows[userInput-1].name;
+                        if (res.rows[userInput - 1].checked === '[x]') {
+                            console.log(`'${selectedName}' have already been checked as done.`);
+                        } else {
+                            const date = new Date();
+                            const currentDate = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
 
-                        let queryText = `UPDATE items SET checked ='[x]', updated_at ='${currentDate}' WHERE name = '${selectedName}' RETURNING *`;
-                        client.query(queryText, (err,res) => {
-                            if (err) {
-                                console.log("ERROR: " + err);
-                            }
-                            console.log(`'${res.rows[0].name}' have been checked as done.`);
-                        });
+                            let queryText = `UPDATE items SET checked ='[x]', updated_at ='${currentDate}' WHERE name = '${selectedName}' RETURNING *`;
+                            client.query(queryText, (err, res) => {
+                                if (err) {
+                                    console.log("ERROR: " + err);
+                                }
+                                asciiText("Checked!");
+                                console.log(`'${res.rows[0].name}' have been checked as done.`);
+                            });
+                        }
                     }
                 })
             }
@@ -101,6 +117,7 @@ const checkDone = () => {
 const uncheckDone = () => {
     let userInput = parseInt(process.argv[3]);
     if (Number.isNaN(userInput)){
+        asciiText("Oh no!");
         console.log("Please key in a valid number.");
     }
     else {
@@ -113,21 +130,27 @@ const uncheckDone = () => {
                     if (err) {
                         console.log("ERROR: " + err);
                     }
-                    let selectedName = res.rows[userInput-1].name;
-                    if (res.rows[userInput-1].checked === '[ ]') {
-                        console.log(`'${selectedName}' is not checked as done.`);
+                    if (userInput-1 > res.rows.length ) {
+                        asciiText("Oh no!");
+                        console.log("Please key in a valid item number.");
                     }
                     else {
-                        const date = new Date();
-                        const currentDate = date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear();
+                        let selectedName = res.rows[userInput - 1].name;
+                        if (res.rows[userInput - 1].checked === '[ ]') {
+                            console.log(`'${selectedName}' is not checked as done.`);
+                        } else {
+                            const date = new Date();
+                            const currentDate = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
 
-                        let queryText = `UPDATE items SET checked ='[ ]', updated_at ='${currentDate}' WHERE name = '${selectedName}' RETURNING *`;
-                        client.query(queryText, (err,res) => {
-                            if (err) {
-                                console.log("ERROR: " + err);
-                            }
-                            console.log(`'${res.rows[0].name}' have been unchecked.`);
-                        });
+                            let queryText = `UPDATE items SET checked ='[ ]', updated_at ='${currentDate}' WHERE name = '${selectedName}' RETURNING *`;
+                            client.query(queryText, (err, res) => {
+                                if (err) {
+                                    console.log("ERROR: " + err);
+                                }
+                                asciiText("Unchecked!");
+                                console.log(`'${res.rows[0].name}' have been unchecked.`);
+                            });
+                        }
                     }
                 })
             }
@@ -139,6 +162,7 @@ const uncheckDone = () => {
 const deleteItem = () => {
     let userInput = parseInt(process.argv[3]);
     if (Number.isNaN(userInput)){
+        asciiText("Oh no!");
         console.log("Please key in a valid number.");
     }
     else {
@@ -151,14 +175,20 @@ const deleteItem = () => {
                     if (err) {
                         console.log("ERROR: " + err);
                     }
-                    let selectedName = res.rows[userInput-1].name;
-                    let queryText = `DELETE FROM items WHERE name = '${selectedName}' RETURNING *`;
-                    client.query(queryText, (err,res) => {
-                        if (err) {
-                            console.log("ERROR: " + err);
-                        }
-                        console.log(`'${res.rows[0].name}' have been deleted.`);
-                    });
+                    if (userInput-1 > res.rows.length ) {
+                        asciiText("Oh no!");
+                        console.log("Please key in a valid item number.");
+                    }
+                    else {
+                        let selectedName = res.rows[userInput - 1].name;
+                        let queryText = `DELETE FROM items WHERE name = '${selectedName}' RETURNING *`;
+                        client.query(queryText, (err, res) => {
+                            if (err) {
+                                console.log("ERROR: " + err);
+                            }
+                            console.log(`'${res.rows[0].name}' have been deleted.`);
+                        });
+                    }
                 })
             }
         });
@@ -166,6 +196,7 @@ const deleteItem = () => {
 };
 
 const showInstructions = () => {
+    asciiText("Welcome!");
     console.log("To use any of the following commands, enter the command key:");
     console.log("add – Add new item (e.g. add buy groceries)");
     console.log("show – Show items");
@@ -173,6 +204,13 @@ const showInstructions = () => {
     console.log("uncheck – Check item as done (e.g. uncheck 2)");
     console.log("delete – Remove item (e.g. delete 2)");
 };
+const asciiText = (string) => {
+    console.log(figlet.textSync(string, {
+        font: 'small',
+        horizontalLayout: 'default',
+        verticalLayout: 'default'
+    }));
+}
 
 // if user did not enter a command
 if (!userCommand) {
