@@ -17,7 +17,7 @@ const client = new pg.Client(configs);
 // function declarations
 const show = () => {
 
-    let queryString = "select * from items";
+    let queryString = "select * from items order by id";
 
     client.query(queryString, (err, result) => {
         if (err) {
@@ -28,7 +28,7 @@ Your list of items to do:
                 `);
 
             result.rows.forEach((item, index) => {
-                if (item.done) {
+                if (item.completed) {
                     console.log(`${index+1}. [X] - ${item.name}`);
                 } else {
                     console.log(`${index+1}. [ ] - ${item.name}`);
@@ -55,6 +55,30 @@ const add = () => {
     });
 }
 
+const done = () => {
+    let queryString = "select id, completed from items order by id";
+
+    client.query(queryString, (err, result) => {
+        if (err) {
+            console.log("query error", err.message);
+        } else {
+            let arrayIndex = (parseInt(userInput)-1);
+            let item = result.rows[arrayIndex];
+            let action = !item.completed;
+
+            queryString = "update items set completed="+ action +" where id="+item.id;
+
+            client.query(queryString, (err, result) => {
+                if (err) {
+                    console.log("query error", err.message);
+                } else {
+                    show();
+                }
+            });
+        }
+    })
+}
+
 const del = () => {
     let queryString = "select id from items";
 
@@ -78,7 +102,7 @@ const del = () => {
     })
 }
 
-// default
+// On user connect
 client.connect((err)=>{
     if( err ){
         console.log( "error", err.message );
@@ -89,6 +113,9 @@ client.connect((err)=>{
                 break;
             case "add":
                 add();
+                break;
+            case "done":
+                done();
                 break;
             case "del":
                 del();
@@ -101,7 +128,7 @@ Commands available:
 
 show : shows current todo list           [ node index.js show             ]
 add  : creates new list items            [ node index.js add "boil water" ]
-done : marks list item as completed      [ node index.js done 2           ]
+done : toggle list item as completed     [ node index.js done 2           ]
 del  : deletes list item                 [ node index.js del  1           ]
 `);
                     process.exit();
