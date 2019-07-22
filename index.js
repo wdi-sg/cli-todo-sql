@@ -33,9 +33,12 @@ let clientConnectionCallback = (err) => {
     } else {
         if(commandType === "add"){
 
-            let text = 'INSERT INTO items (name) VALUES ($1)';
-            let values = [itemList];
+            const now = new Date()
+            let text = 'INSERT INTO items (name, created) VALUES ($1, $2)';
+            let datenow = [now];
+            let values = [itemList, datenow];
             client.query(text, values, queryDoneCallback);
+
         } else if (commandType === "show"){
              text = 'SELECT * FROM items';
             client.query(text, (err, res) => {
@@ -54,6 +57,13 @@ let clientConnectionCallback = (err) => {
             client.query(text, sub, function (err, res) {
                 if (err) throw err;
                 console.log(res.affectedRows + " record(s) updated");
+              });
+        } else if (commandType === "delete"){
+            let text = 'DELETE from items WHERE id = ($1)';
+            let sub = [itemList];
+            client.query(text, sub, function (err, res) {
+                if (err) throw err;
+                console.log("The records have been updated");
               });
         }
 
