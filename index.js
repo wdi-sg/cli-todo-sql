@@ -42,7 +42,7 @@ Your list of items to do:
 
 const add = () => {
 
-    let queryString = "insert into items (name, completed) values ($1, $2);";
+    let queryString = "insert into items (name, completed) values ($1, $2)";
 
     let values = [userInput, false];
 
@@ -53,6 +53,29 @@ const add = () => {
             show();
         }
     });
+}
+
+const del = () => {
+    let queryString = "select id from items";
+
+    client.query(queryString, (err, result) => {
+        if (err) {
+            console.log("query error", err.message);
+        } else {
+            let arrayIndex = (parseInt(userInput)-1);
+            let actualIndex = result.rows[arrayIndex].id;
+
+            queryString = "delete from items where id="+actualIndex;
+
+            client.query(queryString, (err, result) => {
+                if (err) {
+                    console.log("query error", err.message);
+                } else {
+                    show();
+                }
+            });
+        }
+    })
 }
 
 // default
@@ -67,6 +90,9 @@ client.connect((err)=>{
             case "add":
                 add();
                 break;
+            case "del":
+                del();
+                break;
             default:
                     console.log(`
 Welcome to your Todo List.
@@ -78,6 +104,7 @@ add  : creates new list items            [ node index.js add "boil water" ]
 done : marks list item as completed      [ node index.js done 2           ]
 del  : deletes list item                 [ node index.js del  1           ]
 `);
+                    process.exit();
         }
     }
 });
