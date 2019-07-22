@@ -42,12 +42,26 @@ let clientConnectionCallback = (err) => {
 
     }
 //query to mark task completed
-    // else if (process.argv[2] === 'done') {
-    //     let showList = "SELECT * FROM items";
-    //     client.query(showList, queryDoneCallback);
+    else if (process.argv[2] === 'done') {
+        let taskDoneId = process.argv[3];
+        console.log('completed task ' + taskDoneId);
+        let taskDone = "UPDATE items SET done='✅' WHERE id="+taskDoneId;
+        client.query(taskDone, queryDoneCallback);
 
-    // }
+        let showList = "SELECT * FROM items";
+        client.query(showList, queryDoneCallback);
 
+    }
+//query to delete task
+    else if (process.argv[2] === 'delete') {
+        let taskDeleteId = process.argv[3];
+        console.log('deleting task ' + taskDeleteId);
+        let taskDelete = "DELETE FROM items WHERE id="+taskDeleteId;
+        client.query(taskDelete, queryDoneCallback);
+
+        let showList = "SELECT * FROM items";
+        client.query(showList, queryDoneCallback);
+    }
 
 }
 
