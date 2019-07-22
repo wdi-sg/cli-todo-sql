@@ -97,6 +97,43 @@ const checkDone = () => {
         });
     }
 };
+// uncheck item as done function
+const uncheckDone = () => {
+    let userInput = parseInt(process.argv[3]);
+    if (Number.isNaN(userInput)){
+        console.log("Please key in a valid number.");
+    }
+    else {
+        client.connect((err) => {
+            if (err) {
+                console.log("ERROR: " + err);
+            } else {
+                let queryText = "SELECT * FROM items";
+                client.query(queryText, (err,res) => {
+                    if (err) {
+                        console.log("ERROR: " + err);
+                    }
+                    let selectedName = res.rows[userInput-1].name;
+                    if (res.rows[userInput-1].checked === '[ ]') {
+                        console.log(`'${selectedName}' is not checked as done.`);
+                    }
+                    else {
+                        const date = new Date();
+                        const currentDate = date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear();
+
+                        let queryText = `UPDATE items SET checked ='[ ]', updated_at ='${currentDate}' WHERE name = '${selectedName}' RETURNING *`;
+                        client.query(queryText, (err,res) => {
+                            if (err) {
+                                console.log("ERROR: " + err);
+                            }
+                            console.log(`'${res.rows[0].name}' have been unchecked.`);
+                        });
+                    }
+                })
+            }
+        });
+    }
+};
 
 // delete item
 const deleteItem = () => {
@@ -132,7 +169,8 @@ const showInstructions = () => {
     console.log("To use any of the following commands, enter the command key:");
     console.log("add – Add new item (e.g. add buy groceries)");
     console.log("show – Show items");
-    console.log("done – Check item as done (e.g. done 2)");
+    console.log("check – Check item as done (e.g. check 2)");
+    console.log("uncheck – Check item as done (e.g. uncheck 2)");
     console.log("delete – Remove item (e.g. delete 2)");
 };
 
@@ -150,8 +188,11 @@ else {
         case "show" :
             showItem();
             break;
-        case "done" :
+        case "check" :
             checkDone();
+            break;
+        case "uncheck" :
+            uncheckDone();
             break;
         case "delete" :
             deleteItem();
