@@ -42,7 +42,7 @@ let clientConnectionCallback = (err) => {
     let text;
     let now = new Date();
     let year = now.getFullYear();
-    let mth = now.getMonth();
+    let mth = now.getMonth() + 1;
     let date = now.getDate();
     let currDate  = `${year}-${mth}-${date}`;
     let values = [];
@@ -74,11 +74,8 @@ let clientConnectionCallback = (err) => {
             text = `DELETE from items WHERE id ='${value}'`;
             client.query(text, queryDoneCallback);
             break;
-
         default:
             showInstructions();
-            text = 'SELECT * FROM items';
-            client.query(text, queryDoneCallback);
     }
 };
 
