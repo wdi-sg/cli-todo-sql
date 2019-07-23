@@ -2,3 +2,6 @@
 .svn
 *~
 .*.swp
+
+# Don't track content of these folders
+node_modules/
