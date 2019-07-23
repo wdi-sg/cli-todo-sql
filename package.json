@@ -1,0 +1,23 @@
+{
+  "name": "cli-todo-sql",
+  "version": "1.0.0",
+  "description": "![https://i.giphy.com/media/26ufnwz3wDUli7GU0/giphy.webp](https://i.giphy.com/media/26ufnwz3wDUli7GU0/giphy.webp)",
+  "main": "index.js",
+  "dependencies": {
+    "pg": "^7.11.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BenBear93/cli-todo-sql.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BenBear93/cli-todo-sql/issues"
+  },
+  "homepage": "https://github.com/BenBear93/cli-todo-sql#readme"
+}
