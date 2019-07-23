@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 const pg = require('pg');
 
 const configs = {
@@ -146,47 +147,32 @@ const del = function(num) {
             if (err) {
                 console.log("query error", err.message);
             } else {
-                //get last Id
-                let checkMax = 'SELECT MAX(id) FROM items'
+                //update all id below delete item
+                let changeSeq = 'UPDATE items SET id=id-1 WHERE id>' + id;
 
-                client.query(checkMax, (err, res) => {
+                client.query(changeSeq, (err, res) => {
                     if (err) {
                         console.log("query error", err.message);
                     } else {
-                        //loop through each item below the deleted 1 and minus their id by 1
-                        for (let i = id + 1; i < res.rows[0].max + 1; i++) {
-                            let alterSeq = 'UPDATE items SET id=$1 WHERE id=$2'
-                            let arr = [i-1,i];
-
-                            client.query(alterSeq, arr, (err, res) => {
-                                if (err) {
-                                    console.log("query error", err.message);
-                                } else {
-                                    return;
-                                }
-
-                            })
-                        }
 
                         //update primary key next val
                         let setLastId = "SELECT setval('items_id_seq', (SELECT MAX(id) FROM items));"
                         client.query(setLastId, (err, res) => {
-                                if (err) {
-                                    console.log("query error", err.message);
-                                } else {
-                                    console.log("Delete Done")
-                                    process.exit();
-                                }
+                            if (err) {
+                                console.log("query error", err.message);
+                            } else {
+                                console.log("Delete Done")
+                                process.exit();
+                            }
 
-                            })
+                        })
 
                     }
                 });
-
             }
-        });
-    }
 
+        })
+    }
 }
 
 //use to show the nice list pattern when called
