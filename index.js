@@ -33,7 +33,15 @@ let show = () => {
     })
 };
 
-//callback function that runs when client is connected
+let toggleStatus = (result) => {
+    if (result.status === true) {
+        result.status === false;
+    } else if (result.status === false) {
+        result.status === true;
+    }
+};
+
+/* === Callback Functions === */
 let clientConnectionCallback = (err) => {
   if( err ){
     console.log( "error", err.message );
@@ -46,8 +54,9 @@ let clientConnectionCallback = (err) => {
     let values = [taskName, false];
     client.query(text, values, show);
   } else if (command === 'done') {
-    //find the result.row.status and change it to true
-
+    const text = `SELECT * FROM todo WHERE id == ${taskName}`;
+    client.query(toggleStatus(result), show);
+    //ok fuck this shit hahaha
   }
 };
 
