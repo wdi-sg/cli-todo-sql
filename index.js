@@ -11,7 +11,6 @@ const configs = {
     host: '127.0.0.1',
     database: 'todo',
     port: 5432,
-    password: 'password'
 };
 
 const client = new pg.Client(configs);
