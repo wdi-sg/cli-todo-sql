@@ -83,13 +83,37 @@ Note that you may need to change your table to allow for "completion" of an item
 Add a column named `created_at` with data type date and display the date the item was added. Look ahead in the gitbook for how to format the date type with `pg` library [https://wdi-sg.github.io/gitbook-2019/04-databases/postgres/sql-working.html](https://wdi-sg.github.io/gitbook-2019/04-databases/postgres/sql-working.html)
 
 #### Further:
-Add the ability to permanently delete an item.
+Add the ability to archive an item. When you archive an item it means it will no longer show in the list.
 
 #### Further:
 Add a column named `updated_at` with data type date and display the date the item was marked completed.
+
+#### Further:
+`node todo.js stats complete-time` give the average completion time of all items
+
+#### Further:
+`node todo.js stats add-time` give the average amount of items added per day.
+
+#### Further:
+`node todo.js stats best-worst` gives the item that was completed the fastest and the item that was completed the slowest.
+
+#### Further:
+`node todo.js between 1/2/20 1/3/20` gives all the items added between these dates
+
+#### Further:
+Add the same as above but for items completed.
+
+#### Further:
+Get all the items completed between two dates and sort them by the time it took to complete. You can say ascending or descending order.
+
+Ex. `node todo.js stats between 1/2/20 1/3/20 complete-time asc`
 
 #### Further:
 Use an ascii art generator to add style to your app: [http://patorjk.com/software/taag](http://patorjk.com/software/taag) - here you could use the ES6 string interpolation syntax.
 
 #### Further:
 There are frameworks to make a completely dynamic command line app. Use a framework to make the app interactive: [https://medium.freecodecamp.org/writing-command-line-applications-in-nodejs-2cf8327eee2](https://medium.freecodecamp.org/writing-command-line-applications-in-nodejs-2cf8327eee2)
+
+##### Notes:
+
+If you are working with dates, try the momentjs npm library.
