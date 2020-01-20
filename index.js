@@ -37,6 +37,12 @@ const createTable = (rowData) =>{
                 },
                 {
                     value : ' Task'
+                },
+                {
+                    value : ' created_at'
+                },
+                {
+                    value : ' updated_at'
                 }
             ]
     }, function(rendered){
@@ -64,11 +70,16 @@ let showQueryDoneCallBack = (err,result)=>{
         for(let i = 0; i< result.rows.length;i++){
             let id = " "+(i+1)+". ";
             let done = '[ ]';
+            let date = "                     ";
+            let updateDate = result.rows[i].updated_at;
             if(result.rows[i].done){
                 done='[X]';
+                date = updateDate.toString();
             }
             let task = done + " - "+result.rows[i].task+ " ";
-            const currentRow = [id, task];
+            let createDate = result.rows[i].created_at;
+            const currentRow = [id, task, createDate.toString(), date];
+
             displayData.push(currentRow);
         }if(result.rows.length === 0){
             console.log("no data found");
@@ -89,9 +100,11 @@ let done = (num)=>{
         if(result.rows.length === 0){
             console.log("no data found");
         }else{
+            var d = new Date();
+
             id =result.rows[num-1].id;
-            let text = `UPDATE items SET done='true' WHERE id=$1`;
-            let values = [id];
+            let text = `UPDATE items SET done='true', updated_at=$1 WHERE id=$2`;
+            let values = [d,id];
              client.query(text,values, queryDoneCallback);
         }
     }
@@ -107,11 +120,11 @@ let clientConnectionCallback = (err) => {
             text = 'SELECT * FROM items ORDER BY id';
             client.query(text, showQueryDoneCallBack);
         }else if(commandType === "add"){
+            var date = new Date();
             if(process.argv[3]!== undefined){
                 text = `INSERT INTO items (task, done) VALUES ($1,false)`;
                 let values = [process.argv[3]];
                 client.query(text,values, queryDoneCallback);
-
             }
          }else if(commandType === "done"){
          let taskNumber = parseInt(process.argv[3]);
@@ -122,17 +135,9 @@ let clientConnectionCallback = (err) => {
             console.log("Type error: enter a valid number");
             client.end();
         }
+    }else{
+        console.log("Add a valid input");
     }
-   /* }else if(commandType === "remove"){
-        var taskNum = parseInt(task);
-        if(isNaN(taskNum) === false){
-            remove(taskNum);
-        }
-    }*/
-  //  let text = "INSERT INTO items (name) VALUES ($1) RETURNING id";
-  //  const values = ["hello"];
-  // let text ="SELECT * FROM items; returns name";
-
 }
 
 client.connect(clientConnectionCallback);
