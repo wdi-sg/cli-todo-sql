@@ -46,7 +46,7 @@ let clientConnectionCallback = (err) => {
       command = `INSERT INTO items (name) VALUES ($1) RETURNING *`;
          // query values must always be an error
       values = process.argv[3];
-      let taskToPrint = [`[ ] - `+ values];
+      let taskToPrint = [values];
       console.log(taskToPrint);
       client.query(command, taskToPrint, queryDoneCallback);
       break;
@@ -57,12 +57,21 @@ let clientConnectionCallback = (err) => {
     let queryValue = [taskId];
     console.log(taskId);
         //add 'x' in Completed column
-      command = `UPDATE items set Completed = 'x' WHERE id = ($1)`;
+      command = `UPDATE items set completed = 'x', updated_at = now() WHERE id = ($1)`;
       client.query(command, queryValue, queryDoneCallback);
       break;
 
+    case "archive":
+    // Add the ability to archive an item. When you archive an item it means it will no longer show in the list.
+    taskId = parseInt(process.argv[3]);
+    queryValue = [taskId];
+
+    command = `DELETE from items WHERE id = ($1)`;
+      client.query(command, queryValue, queryDoneCallback);
+    break;
+
     default:
-      console.log(`What would you like the table to do? - add task, show tasks or mark it as done?.`);
+      console.log(`What would you like to do? - add/show/archive tasks or mark it as done?.`);
   } //switch statement closing
 
 
