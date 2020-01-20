@@ -54,14 +54,23 @@ let clientConnectionCallback = (err) => {
   // Query Strings 
   let text = "INSERT INTO items (name,doneYet) VALUES ($1,$2) RETURNING *";
   let text2 = "SELECT * from items"
+  let 
 
   const values = [newTask,false];
 
-  if(process.argv[2] == "show"){
-    client.query(text2,queryDoneCallback2)
-  } else if (process.argv[2] == "add") {
-    client.query(text, values, queryDoneCallback);
-    client.query(text2,queryDoneCallback2)
+  
+
+  switch(process.argv[2]){
+    case("show"):
+      client.query(text2,queryDoneCallback2)
+      break;
+    case("add"):
+      client.query(text, values, queryDoneCallback);
+      client.query(text2,queryDoneCallback2);
+      break;
+    default:
+    console.log("hey");
+      break;
   }
 
   
