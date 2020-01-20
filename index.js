@@ -1,5 +1,4 @@
 const pg = require('pg');
-const Table = require('ascii-art-table');
 const AsciiTable = require('ascii-table');
 
 // console.log("works!!", process.argv[2]);
