@@ -20,10 +20,10 @@ let queryDoneCallback = (err, result) => {
                 console.log("result", result.rows );
             break;
             case "add":
-                console.log("Added "+process.argv[3]+" to To-Do-List")
+                console.log("Added '"+result.rows[0].name+"' to To-Do-List")
             break;
             case "done":
-                console.log("Task "+process.argv[3]+". done.")
+                console.log("Task '"+result.rows[0].name+"' done.")
             break;
             default:
             console.log("Something is wrong in queryDoneCallback")
