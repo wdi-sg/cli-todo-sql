@@ -103,19 +103,26 @@ let archiving=(num)=>{
         if(result.rows.length === 0){
             console.log("no data found");
         }else{
-       let index = -1;
-            for(let i = 0;i< result.rows.length;i++){
-                if(num ===result.rows[i].id)
-                {    index =i;
+            let index = 0;
+            let found =false;
+        for(let i = 0; i< result.rows.length;i++){
+            if(!result.rows[i].archived){
+                if(parseInt(num) === index){
+                    found = true;
                     break;
                 }
+                console.log("dcfs",index,num);
                 index++;
             }
+        }if(found){
             let currentId = result.rows[index].id;
             console.log(currentId);
             let text = `UPDATE items SET archived='true' WHERE id=$1`;
             let values = [currentId];
              client.query(text,values, queryDoneCallback);
+         }else{
+            console.log("no match found");
+         }
         }
     }
         });
@@ -131,19 +138,28 @@ let done = (num)=>{
             console.log("no data found");
         }else{
             var d = new Date();
-            let index = -1;
-            for(let i = 0;i< result.rows.length;i++){
-                if(num ===result.rows[i].id)
-                {    index =i;
-                    break;
+            let found = false;
+            let index = 0;
+            for(let i = 0; i< result.rows.length;i++){
+                if(!result.rows[i].archived){
+
+                    if(num === index){
+                        found=true;
+
+                        break;
+                    }
+                    index++;
                 }
-                index++;
             }
+            if(found){
             let currentId = result.rows[index].id;
             console.log(index);
             let text = `UPDATE items SET done='true', updated_at=$1 WHERE id=$2`;
             let values = [d,currentId];
              client.query(text,values, queryDoneCallback);
+         }else{
+            console.log("No match found");
+         }
         }
     }
     });
@@ -174,7 +190,7 @@ let clientConnectionCallback = (err) => {
         }
     }else if(commandType === "archive"){
         if(process.argv[3]!== undefined){
-                let values = [process.argv[3]];
+                let values = parseInt(process.argv[3]);
                 archiving(values);
             }
     }else{
