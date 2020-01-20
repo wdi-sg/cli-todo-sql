@@ -160,7 +160,15 @@ const displayAverageItemsAddedPerDay = () => {
 
 // Gives the item and ID of item completed the fastest and completed the slowest.
 const fastestAndSlowest = () => {
-    return;
+    const queryString = "SELECT * FROM items";
+    client.query(queryString, (err, result) => {
+        if (result.rows.length) {
+            // Do the thing
+        } else {
+            console.log(`No tasks are in your database.`);
+            client.end();
+        }
+    })
 }
 
 
