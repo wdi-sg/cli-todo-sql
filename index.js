@@ -67,8 +67,11 @@ let showQueryDoneCallBack = (err,result)=>{
       console.log("query error", err.message);
     } else {
         const displayData = [];
+        let index = 0;
         for(let i = 0; i< result.rows.length;i++){
-            let id = " "+(i+1)+". ";
+            if(!result.rows[i].archived){
+            index++;
+            let id = " "+index+". ";
             let done = '[ ]';
             let date = "                     ";
             let updateDate = result.rows[i].updated_at;
@@ -81,7 +84,8 @@ let showQueryDoneCallBack = (err,result)=>{
             const currentRow = [id, task, createDate.toString(), date];
 
             displayData.push(currentRow);
-        }if(result.rows.length === 0){
+        }
+        }if(displayData.length === 0){
             console.log("no data found");
         }else{
         createTable(displayData);
@@ -89,7 +93,33 @@ let showQueryDoneCallBack = (err,result)=>{
     }
      client.end();
 }
-
+let archiving=(num)=>{
+    let text = `SELECT * FROM items`;
+    client.query(text, (err,result)=>{
+    if(err){
+         console.log("query error", err.message);
+    }else{
+    let id;
+        if(result.rows.length === 0){
+            console.log("no data found");
+        }else{
+       let index = -1;
+            for(let i = 0;i< result.rows.length;i++){
+                if(num ===result.rows[i].id)
+                {    index =i;
+                    break;
+                }
+                index++;
+            }
+            let currentId = result.rows[index].id;
+            console.log(currentId);
+            let text = `UPDATE items SET archived='true' WHERE id=$1`;
+            let values = [currentId];
+             client.query(text,values, queryDoneCallback);
+        }
+    }
+        });
+}
 let done = (num)=>{
    let text = `SELECT * FROM items`;
     client.query(text, (err,result)=>{
@@ -101,10 +131,18 @@ let done = (num)=>{
             console.log("no data found");
         }else{
             var d = new Date();
-
-            id =result.rows[num-1].id;
+            let index = -1;
+            for(let i = 0;i< result.rows.length;i++){
+                if(num ===result.rows[i].id)
+                {    index =i;
+                    break;
+                }
+                index++;
+            }
+            let currentId = result.rows[index].id;
+            console.log(index);
             let text = `UPDATE items SET done='true', updated_at=$1 WHERE id=$2`;
-            let values = [d,id];
+            let values = [d,currentId];
              client.query(text,values, queryDoneCallback);
         }
     }
@@ -120,9 +158,8 @@ let clientConnectionCallback = (err) => {
             text = 'SELECT * FROM items ORDER BY id';
             client.query(text, showQueryDoneCallBack);
         }else if(commandType === "add"){
-            var date = new Date();
             if(process.argv[3]!== undefined){
-                text = `INSERT INTO items (task, done) VALUES ($1,false)`;
+                text = `INSERT INTO items (task, done, archived) VALUES ($1,false,false)`;
                 let values = [process.argv[3]];
                 client.query(text,values, queryDoneCallback);
             }
@@ -135,8 +172,14 @@ let clientConnectionCallback = (err) => {
             console.log("Type error: enter a valid number");
             client.end();
         }
+    }else if(commandType === "archive"){
+        if(process.argv[3]!== undefined){
+                let values = [process.argv[3]];
+                archiving(values);
+            }
     }else{
         console.log("Add a valid input");
+        client.end();
     }
 }
 
