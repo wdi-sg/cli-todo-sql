@@ -21,10 +21,11 @@ let queryDoneCallback = (err, result) => {
         //console.log("result", result.rows);
         //console.log(result.rows.length);
         let displayTable = new AsciiTable('TO-DO LIST');
-        displayTable.setHeading('No.', 'Done', 'Chore', 'Date Created')
+        displayTable.setHeading('No.', 'Done', 'Chore', 'Date Created', 'Date Updated')
         displayTable.setAlign(1, AsciiTable.CENTER);
         for (i = 0; i < result.rows.length; i++) {
             const dateCreated = result.rows[i].created;
+            const dateUpdated = result.rows[i].updated;
             // const dateCreatedString = `${dateCreated.getDate().toString().padStart(2,'0')}-${(dateCreated.getMonth()+1).toString().padStart(2,'0')}-${dateCreated.getFullYear()}`;
             let box = " ";
             if (result.rows[i].done === true) {
@@ -32,7 +33,7 @@ let queryDoneCallback = (err, result) => {
             } else {
               box = " ";
             }
-            displayTable.addRow(result.rows[i].id, box, result.rows[i].name, dateCreated);
+            displayTable.addRow(result.rows[i].id, box, result.rows[i].name, dateCreated, dateUpdated);
         }
         // listToDoItems();
         //console.log(result.row)
@@ -45,7 +46,7 @@ let queryDoneCallback = (err, result) => {
 let queryText;
 let values;
 let choresDone = false;
-let dateAt = moment().format('MMMM Do YYYY, h:mm:ss a');
+let dateAt = moment().format('lll');
 
 const listToDoItems = () => {
     let queryText = 'SELECT * FROM todo ORDER BY id ASC';
@@ -78,9 +79,9 @@ let clientConnectionCallback = (err, result) => {
         //     values = [process.argv[3], date];
         //     break;
         case 'done':
-            queryText = 'UPDATE todo set done=$2, created=$3 WHERE id=$1 RETURNING *';
+            queryText = 'UPDATE todo set done=$2, updated=$3 WHERE id=$1 RETURNING *';
             choresDone = true;
-            dateAt = moment().format('MMMM Do YYYY, h:mm:ss a');
+            dateAt = moment().format('lll');
             values = [process.argv[3], choresDone, dateAt];
             break;
           case 'delete':
