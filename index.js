@@ -24,8 +24,11 @@ let queryDoneCallback = (err, result) => {
         } else {
             done = "[x]";
         }
-      let obj = result.rows[i]
-      console.log(`${obj.id}. ${done} - ${obj.name} created at: ${obj.created_at}` );
+        let obj = result.rows[i];
+
+        if (obj.archived === null){
+            console.log(`${obj.id}. ${done} - ${obj.name} created at: ${obj.created_at}` );
+        }
       }
     }
     client.end();
@@ -42,6 +45,8 @@ let queryInsert = (err, result) => {
 
 let clientConnectionCallback = (err) => {
 
+    let values = [process.argv[3]];
+
     if( err ){
         console.log( "error", err.message );
     }
@@ -52,14 +57,17 @@ let clientConnectionCallback = (err) => {
     }
 
     if(process.argv[2] === "add"){
-        let values = [process.argv[3]];
         let text = `INSERT INTO items (name,completed,created_at) VALUES ($1,false,CURRENT_TIMESTAMP) RETURNING *`;
         client.query(text, values, queryInsert);
     }
 
     if(process.argv[2] === "done"){
-        let values = [process.argv[3]]
         let text = "UPDATE items SET completed = true, updated_at = CURRENT_TIMESTAMP WHERE id = ($1) RETURNING *"
+        client.query(text, values, queryDoneCallback);
+    }
+
+    if(process.argv[2] === "archive"){
+        let text = "UPDATE items SET archived = true WHERE id = ($1) RETURNING *";
         client.query(text, values, queryDoneCallback);
     }
 };
