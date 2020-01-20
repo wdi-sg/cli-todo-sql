@@ -1,4 +1,4 @@
-console.log("works!!", process.argv[2]);
+console.log("works!!");
 
 const pg = require('pg');
 
@@ -33,26 +33,45 @@ const client = new pg.Client(configs);
 //   client.query(text, values, queryDoneCallback);
 // };
 
-// client.connect(clientConnectionCallback);
-if(process.argv[2] === "show"){
-    client.connect((err) => {
+let clientConnectionCallback = (err) => {
+//--------------------SHOW TABLE------------------
+    if(process.argv[2] === "show"){
+        client.connect((err) => {
 
-      if( err ){
-        console.log( "error", err.message );
-      }
+          if( err ){
+            console.log( "error", err.message );
+          }
 
-      const text = 'SELECT * FROM items'
+          const text = 'SELECT * FROM items'
 
-      client.query(text, (err, res) => {
+          client.query(text, (err, res) => {
+            if (err) {
+              console.log("query error", err.message);
+            } else {
+              console.log("result", res.rows);
+              client.end();
+            }
+          });
+
+        });
+    }
+//----------------------ADD ITEMS-----------------
+    if( process.argv[2] === "add"){
+    let queryText = 'INSERT INTO items (name) VALUES ($1)';
+
+    let values = [process.argv[3]];
+    console.log(values)
+    client.query(queryText, values, (err, res) => {
         if (err) {
           console.log("query error", err.message);
         } else {
-          console.log("result", res.rows);
-          client.end();
+            console.log("created!")
+            client.end();
         }
-      });
-
     });
-}else{
-    console.log("errors!")
-}
+    }
+    else{
+        console.log("error")
+    }
+ };
+client.connect(clientConnectionCallback);
