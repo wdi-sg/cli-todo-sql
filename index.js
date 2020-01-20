@@ -14,7 +14,7 @@ let queryDoneCallback = (err, result) => {
       console.log("query error", err.message);
     } else {
       for (let i = 0; i < result.rows.length; i++){
-        console.log(`${result.rows[i].id}. [] - ${result.rows[i].todo}`)
+        console.log(`${result.rows[i].id}. ${result.rows[i].done} - ${result.rows[i].todo}`)
       }
     }
     client.end();
@@ -29,17 +29,20 @@ let clientConnectionCallback = (err) => {
   let queryText;
   const command = process.argv[2].toLowerCase()
 
-  const values = [process.argv[3]];
+  const values = [process.argv[3], "[]"];
 
   if (command === "add"){
-    queryText = "INSERT INTO items (todo) VALUES ($1) RETURNING *"
+    queryText = "INSERT INTO items (todo, done) VALUES ($1, $2) RETURNING *"
     client.query(queryText, values, queryDoneCallback);
   } else if (command === "show") {
-    queryText = "SELECT * FROM items"
+    queryText = "SELECT * FROM items ORDER BY done ASC"
     client.query(queryText, queryDoneCallback)
+  } else if (command === "done"){
+    values.pop()
+    queryText = "UPDATE items SET done='[X]' WHERE id=$1"
+    client.query(queryText, values, queryDoneCallback)
   }
 
-  
 };
 
 client.connect(clientConnectionCallback);
