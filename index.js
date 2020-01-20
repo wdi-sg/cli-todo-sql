@@ -20,7 +20,7 @@ let queryDoneCallback = (err, result) => {
       console.log("query error", err.message);
     } else {
       console.log("result", result.rows );
-      //NOTE: result.rows = array of objects
+      //NOTE: result.rows is an array of objects
       // console.log("result", result.rows[0].name );
     }
     client.end(); //disconnects client from DB Server
@@ -31,7 +31,10 @@ let clientConnectionCallback = (err) => {
   if( err ){
     console.log( "error", err.message );
   }
-let command; //takes in diff commands based on use
+
+    let command; //takes in diff commands based on user keyword
+    let values; //the task input by user (must be enclosed in quotation marks,if string:add, number:done)
+
   switch(process.argv[2]) {
     case "show":
       command = `SELECT *  FROM items`;
@@ -40,13 +43,22 @@ let command; //takes in diff commands based on use
     break;
 
     case "add":
-    //if process.argv[2] === 'add'
       command = `INSERT INTO items (name) VALUES ($1) RETURNING *`;
          // query values must always be an error
-      const values = process.argv[3];
+      values = process.argv[3];
       let taskToPrint = [`[ ] - `+ values];
       console.log(taskToPrint);
       client.query(command, taskToPrint, queryDoneCallback);
+      break;
+
+    case "done":
+    //select task with id accdg to user input
+    let taskId = parseInt(process.argv[3]);
+    let queryValue = [taskId];
+    console.log(taskId);
+        //add 'x' in Completed column
+      command = `UPDATE items set Completed = 'x' WHERE id = ($1)`;
+      client.query(command, queryValue, queryDoneCallback);
       break;
 
     default:
