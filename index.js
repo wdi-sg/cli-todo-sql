@@ -163,7 +163,20 @@ const fastestAndSlowest = () => {
     const queryString = "SELECT * FROM items";
     client.query(queryString, (err, result) => {
         if (result.rows.length) {
-            // Do the thing
+            let fastestItem = result.rows[0];
+            let slowestItem = result.rows[0];
+            for (const item of result.rows) {
+              const timeDiff = Math.abs(item.dateupdated - item.datecreated);
+              const fastDiff = Math.abs(fastestItem.dateupdated - fastestItem.datecreated);
+              const slowDiff = Math.abs(slowestItem.dateupdated - slowestItem.datecreated);
+              fastestItem = timeDiff < fastDiff ? item : fastestItem;
+              slowestItem = timeDiff > slowDiff ? item : slowestItem;
+              fastestItem.fastTimeDiff = fastDiff;
+              slowestItem.slowTimeDiff = slowDiff;
+            }
+            console.log('Fastest Item:', fastestItem);
+            console.log('Slowest Item:', slowestItem);
+            client.end();
         } else {
             console.log(`No tasks are in your database.`);
             client.end();
