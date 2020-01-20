@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/joycemap/cli-todo-sql#readme",
   "dependencies": {
+    "moment": "^2.24.0",
     "pg": "^7.17.1"
   }
 }
