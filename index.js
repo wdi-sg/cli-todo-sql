@@ -34,6 +34,7 @@ let showTodos = (err, result) => {
   for (let i = 0; i < result.rows.length; i++) {
     let todo = result.rows[i];
     let done = todo.done;
+    
     if (done === true) {
       console.log(`${todo.id}. [x] - ${todo.name} 
       Created at: ${todo.created_at},
@@ -63,6 +64,8 @@ let doneTodo = (err, result) => {
   client.end();
 };
 
+
+
 let clientConnectionCallback = err => {
   if (err) {
     console.log("error", err.message);
@@ -79,7 +82,7 @@ let clientConnectionCallback = err => {
     SET done = TRUE, updated_at = NOW()
     WHERE id = ${process.argv[3]} RETURNING *;`;
     client.query(text, doneTodo);
-  }
+  } 
 
   // const values = ["hello"];
 };
