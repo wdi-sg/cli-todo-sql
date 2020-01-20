@@ -96,19 +96,6 @@ const listItems = () => {
 }
 
 
-// Parser for the different statistics functions.
-const displayStatistics = (inputArg) => {
-    switch (inputArg) {
-        case 'complete-time':
-            displayAvgCompletionTime();
-            break;
-        default:
-            console.log('Not a valid statistic to show.');
-            break;
-    }
-}
-
-
 // node todo.js stats complete-time give the average completion time of all items
 const displayAvgCompletionTime = () => {
     const queryString = "SELECT * FROM items WHERE isdone = true";
@@ -137,6 +124,43 @@ const displayAvgCompletionTime = () => {
             client.end();
         }
     })
+}
+
+
+// Average number of items created per day
+const displayAverageItemsAddedPerDay = () => {
+    const queryString = "SELECT * FROM items";
+    client.query(queryString, (err, result) => {
+        if (result.rows.length) {
+            let newestDate = new Date(1, 1, 1);
+            let oldestDate = new Date();
+            for (const item of result.rows) {
+                if (item.datecreated) {
+                    oldestDate = item.datecreated < oldestDate ? item.datecreated : oldestDate;
+                    newestDate = item.datecreated > newestDate ? item.datecreated : newestDate;
+                }
+            }
+            oldestDate = oldestDate.getTime();
+            newestDate = newestDate.getTime();
+
+            let timeDiff = newestDate - oldestDate;
+            // Convert to days
+            timeDiff = timeDiff / (1000 * 60 * 60 * 24); // number of days.
+            const tasksPerDay = (result.rows.length / timeDiff); // tasks per day
+            console.log(`Since the first task to the newest task:`);
+            console.log(`${tasksPerDay} tasks have been created per day`);
+            client.end();
+        } else {
+            console.log(`No tasks are in your database.`);
+            client.end();
+        }
+    })
+}
+
+
+// Gives the item and ID of item completed the fastest and completed the slowest.
+const fastestAndSlowest = () => {
+    return;
 }
 
 
@@ -246,6 +270,25 @@ const whatCommand = () => {
             break;
         default:
             console.log('Not a valid command');
+            break;
+    }
+}
+
+
+// Parser for the different statistics functions.
+const displayStatistics = (inputArg) => {
+    switch (inputArg) {
+        case 'complete-time':
+            displayAvgCompletionTime();
+            break;
+        case 'add-time':
+            displayAverageItemsAddedPerDay();
+            break;
+        case 'best-worst':
+            fastestAndSlowest();
+            break;
+        default:
+            console.log('Not a valid statistic to show.');
             break;
     }
 }
