@@ -52,13 +52,11 @@ let clientConnectionCallback = (err) => {
   let newTask = process.argv[3];
 
   // Query Strings 
-  let text = "INSERT INTO items (name,doneYet) VALUES ($1,$2) RETURNING *";
+  let text = "INSERT INTO items (name,doneYet,date_created) VALUES ($1,$2,$3) RETURNING *";
   let text2 = "SELECT * from items"
-  let 
-
-  const values = [newTask,false];
-
+  let text3 = `UPDATE items SET doneyet = 'true' WHERE name = $1;`;
   
+  const values = [newTask,false, new Date()];
 
   switch(process.argv[2]){
     case("show"):
@@ -68,8 +66,14 @@ let clientConnectionCallback = (err) => {
       client.query(text, values, queryDoneCallback);
       client.query(text2,queryDoneCallback2);
       break;
+    case("done"):
+      let doneTask = process.argv[3];
+      const values2 = [doneTask]
+      client.query(text3,values2,queryDoneCallback);
+      client.query(text2,queryDoneCallback2);
+
     default:
-    console.log("hey");
+      console.log("hey");
       break;
   }
 
@@ -77,3 +81,4 @@ let clientConnectionCallback = (err) => {
 };
 
 client.connect(clientConnectionCallback);
+
