@@ -18,7 +18,7 @@ let queryDoneCallback = (err, result) => {
     } else {
       for (let i = 0; i < result.rows.length; i++){
         if(!result.rows[i].archived)
-        console.log(`${result.rows[i].id}. ${result.rows[i].done} - ${result.rows[i].todo} - added on: ${result.rows[i].created_at}`)
+        console.log(`${result.rows[i].id}. ${result.rows[i].done} - ${result.rows[i].todo}\ncreated at: ${result.rows[i].created_at}\nupdated at: ${result.rows[i].updated_at}`)
       }
     }
     client.end();
@@ -43,7 +43,7 @@ let clientConnectionCallback = (err) => {
     client.query(queryText, queryDoneCallback)
   } else if (command === "done"){
     values.pop()
-    queryText = "UPDATE items SET done='[X]' WHERE id=$1 RETURNING *"
+    queryText = "UPDATE items SET done='[X]', updated_at=CURRENT_TIMESTAMP WHERE id=$1 RETURNING *"
     client.query(queryText, values, queryDoneCallback)
   } else if (command === "archive") {
     values.pop()
