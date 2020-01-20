@@ -10,7 +10,6 @@ const configs = {
 
 const client = new pg.Client(configs);
 
-
 let queryDoneCallback = (err, result) => {
     if (err) {
       console.log("query error", err.message);
