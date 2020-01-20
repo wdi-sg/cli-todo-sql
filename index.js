@@ -66,7 +66,7 @@ const archiveItem = (idNo) => {
 
 
 // List the items.
-const listItems = () => {
+const listItems = (dateBefore='01/01/1000', dateAfter='01/01/2999') => {
     let listText = "SELECT * FROM items ORDER BY id";
     client.query(listText, (error, result) => {
         if (error) {
@@ -74,12 +74,15 @@ const listItems = () => {
             client.end();
         };
 
+        let setDateBefore = new Date(dateBefore);
+        let setDateAfter = new Date(dateAfter);
+
         let displayTable = new AsciiTable('TO-DO LIST');
         displayTable.setHeading('No.', 'Done', 'Item', 'Date Created', 'Date Updated')
         displayTable.setAlign(1, AsciiTable.CENTER);
 
         for (const item of result.rows) {
-            if (item.archived) {
+            if (item.archived || item.datecreated < setDateBefore || item.datecreated > setDateAfter) {
                 continue
             };
             let markedAsDone = item.isdone ? "X" : " ";
@@ -288,6 +291,9 @@ const whatCommand = () => {
             break;
         case 'stats':
             displayStatistics(commandArg);
+            break;
+        case 'between':
+            listItems(commandArg, process.argv[4]);
             break;
         default:
             console.log('Not a valid command');
