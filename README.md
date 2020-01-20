@@ -92,6 +92,11 @@ Add a column named `updated_at` with data type date and display the date the ite
 `node todo.js stats complete-time` give the average completion time of all items
 
 #### Further:
+In order to have data in your system for items that have been created and completed, write a separate file that inserts data into your database so that you can test that functionality.
+
+Call it `test.js`. Inside create todo items and insert them into the database with the dates that will allow you to test your functionality. 
+
+#### Further:
 `node todo.js stats add-time` give the average amount of items added per day.
 
 #### Further:
