@@ -1,15 +1,16 @@
-console.log("works!!", process.argv[2]);
-
 const pg = require('pg');
 
 const configs = {
-    user: 'akira',
+    user: 'safraz',
     host: '127.0.0.1',
     database: 'todo',
     port: 5432,
 };
 
 const client = new pg.Client(configs);
+
+let text = "";
+var values=[];
 
 let queryDoneCallback = (err, result) => {
     if (err) {
@@ -19,17 +20,30 @@ let queryDoneCallback = (err, result) => {
     }
 };
 
-let clientConnectionCallback = (err) => {
+let add = () => {
+  text = `INSERT INTO items (name, complete) VALUES ($1, $2) RETURNING id`;
+  values = [process.argv[3]," "];
+}
 
-  if( err ){
-    console.log( "error", err.message );
+let done = () => {
+  text = `UPDATE items SET complete='X' WHERE id=$1`;
+  values = [parseInt(process.argv[3])];
+}
+
+let show = () => {
+  text = `SELECT * FROM items`
+  values = [];
+}
+
+let whenConnect = () => {
+  if (process.argv[2]=="add") {
+    add();
+  } else if (process.argv[2]=="done") {
+    done();
+  } else if (process.argv[2]=="show") {
+    show();
   }
-
-  let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
-
-  const values = ["hello"];
-
   client.query(text, values, queryDoneCallback);
 };
 
-client.connect(clientConnectionCallback);
+client.connect(whenConnect);
