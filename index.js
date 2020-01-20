@@ -20,6 +20,7 @@ const commandArg = process.argv[3];
 // *** FUNCTIONS! *** //
 ////////////////////////
 
+
 // When the query is done what does the DB tell me?
 let queryDoneCallback = (err, result) => {
     if (err) {
@@ -34,9 +35,10 @@ let queryDoneCallback = (err, result) => {
             console.log(`${result.rows[0].id}. [${markedAsDone}] - ${result.rows[0].name} - Created: ${dateCreated.getDate()}-${dateCreated.getMonth()+1}-${dateCreated.getFullYear()} - Updated: ${dateUpdated.getDate()}-${dateUpdated.getMonth()+1}-${dateUpdated.getFullYear()}`);
         }
         console.log('****************************************')
-        listToDoListItems();
+        listItems();
     }
 };
+
 
 // Archive an ID (not delete)
 const archiveItem = (idNo) => {
@@ -46,34 +48,63 @@ const archiveItem = (idNo) => {
         console.log('Error please put in a valid number');
         return;
     }
-    let text = "UPDATE items SET archived=$1, dateupdated=$2 WHERE id=$3 RETURNING *"
+    let text = "UPDATE items SET archived=NOT archived, dateupdated=$1 WHERE id=$2 RETURNING *"
     const date = new Date();
-    const values = [true, date, inputNo];
+    const values = [date, inputNo];
     client.query(text, values, queryDoneCallback);
 }
 
+
 // List the items.
-const listToDoListItems = () => {
+const listItems = () => {
     let listText = "SELECT * FROM items ORDER BY id";
-    client.query(listText, (err, result) => {
+    client.query(listText, (error, result) => {
+        if (error) {
+          console.log('Error!', error);
+          client.end();
+        };
+
         let displayTable = new AsciiTable('TO-DO LIST');
         displayTable.setHeading('No.', 'Done', 'Item', 'Date Created', 'Date Updated')
         displayTable.setAlign(1, AsciiTable.CENTER);
-        for (let i = 0; i < result.rows.length; i++) {
-            if (result.rows[i].archived) {continue};
-            let markedAsDone = result.rows[i].isdone ? "X" : " ";
-            const dateCreated = new Date(result.rows[i].datecreated);
+
+        for (const item of result.rows) {
+            if (item.archived) {
+                continue
+            };
+            let markedAsDone = item.isdone ? "X" : " ";
+            const dateCreated = new Date(item.datecreated);
             const dateCreatedString = `${dateCreated.getDate().toString().padStart(2,'0')}-${(dateCreated.getMonth()+1).toString().padStart(2,'0')}-${dateCreated.getFullYear()}`;
-            const dateUpdated = new Date(result.rows[i].dateupdated);
+            const dateUpdated = new Date(item.dateupdated);
             const dateUpdatedString = `${(dateUpdated.getDate()).toString().padStart(2,'0')}-${(dateUpdated.getMonth()+1).toString().padStart(2,'0')}-${dateUpdated.getFullYear()}`;
-            // console.log(`${result.rows[i].id}. [${markedAsDone}] - ${result.rows[i].name} - Created: ${dateCreated.getDate()}-${dateCreated.getMonth()+1}-${dateCreated.getFullYear()} - Updated: ${dateUpdated.getDate()}-${dateUpdated.getMonth()+1}-${dateUpdated.getFullYear()}`);
-            displayTable.addRow(result.rows[i].id, markedAsDone, result.rows[i].name, dateCreatedString, dateUpdatedString);
+            displayTable.addRow(item.id, markedAsDone, item.name, dateCreatedString, dateUpdatedString);
         }
         console.log(displayTable.toString());
         client.end();
     })
 
 }
+
+
+// Parser for the different statistics functions.
+const displayStatistics = (inputArg) => {
+  switch (inputArg) {
+    case 'complete-time':
+      displayAvgCompletionTime();
+      break;
+    default:
+    console.log('Not a valid statistic to show.');
+    break;
+  }
+}
+
+
+// node todo.js stats complete-time give the average completion time of all items
+const displayAvgCompletionTime = () => {
+  const queryString = "SELECT * FROM items ORDER BY id";
+}
+
+
 
 // Delete an item at index.
 const deleteItem = (inputNo) => {
@@ -98,9 +129,9 @@ const markedDone = (idNo) => {
         console.log('Error please put in a valid number');
         return;
     }
-    let text = "UPDATE items SET isdone=$1, dateupdated=$2 WHERE id=$3 RETURNING *"
+    let text = "UPDATE items SET isdone = NOT isdone, dateupdated=$1 WHERE id=$2 RETURNING *"
     const date = new Date();
-    const values = [true, date, inputNo];
+    const values = [date, inputNo];
     client.query(text, values, queryDoneCallback);
 }
 
@@ -108,8 +139,8 @@ const markedDone = (idNo) => {
 // Add a to do list item!
 const addToDoListItem = (inputArg) => {
     console.log('adding' + inputArg);
-    let text = "INSERT INTO items (name, isdone, datecreated, dateupdated) VALUES ($1, $2, $3, $4) RETURNING *"
-    const values = [inputArg, false, new Date(), new Date()];
+    let text = "INSERT INTO items (name, isdone, datecreated, dateupdated, archived) VALUES ($1, $2, $3, $4, $5) RETURNING *"
+    const values = [inputArg, false, new Date(), new Date(), false];
     client.query(text, values, queryDoneCallback)
 }
 
@@ -124,10 +155,7 @@ let clientConnectionCallback = (err) => {
     if (process.argv[2]) {
         whatCommand();
     } else {
-        listToDoListItems();
-        // let text = "SELECT * FROM items";
-        //
-        // client.query(text, queryDoneCallback);
+        listItems();
     }
 };
 
@@ -138,10 +166,10 @@ const whatCommand = () => {
             addToDoListItem(commandArg);
             break;
         case 'show':
-            listToDoListItems();
+            listItems();
             break;
         case 'display':
-            listToDoListItems();
+            listItems();
             break;
         case 'done':
             markedDone(commandArg);
@@ -154,6 +182,9 @@ const whatCommand = () => {
             break;
         case 'archive':
             archiveItem(commandArg);
+            break;
+        case 'stats':
+            displayStatistics(commandArg);
             break;
         default:
             console.log('Not a valid command');
