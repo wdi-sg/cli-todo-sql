@@ -17,6 +17,7 @@ let queryDoneCallback = (err, result) => {
     } else {
       console.log("result", result.rows );
     }
+    client.end();
 };
 
 let clientConnectionCallback = (err) => {
