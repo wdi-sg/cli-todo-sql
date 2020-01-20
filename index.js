@@ -39,17 +39,21 @@ let clientConnectionCallback = (err) => {
         // client.connect((err) => {
 
             if (err) {
-                console.log("eerror", err.message);
+                console.log("error", err.message);
             }
 
-            const text = 'SELECT * FROM items'
+            const text = 'SELECT * FROM items ORDER BY id, id ASC'
 
             client.query(text, (err, res) => {
                 if (err) {
                     console.log("query error", err.message);
                 } else {
                     for (var i = 0; i < res.rows.length; i++) {
+                        if(res.rows[i].status === true){
+                        console.log(res.rows[i].id+". [X]  "+res.rows[i].name)
+                        }else{
                         console.log(res.rows[i].id+". [ ]  "+res.rows[i].name)
+                        }
                     }
                     // console.log("result", res.rows);
                     client.end();
@@ -72,7 +76,17 @@ let clientConnectionCallback = (err) => {
                 client.end();
             }
         });
-    } else {
+    } if(process.argv[2] === "done") {
+        let queryText = 'UPDATE items SET status = true WHERE id = $1';
+        let values = [process.argv[3]]
+        client.query(queryText, values, (err, res) => {
+            if (err) {
+                console.log("query error", err.message);
+            } else {
+                console.log( "task done!")
+            }
+
+        })
     }
 };
 client.connect(clientConnectionCallback);
