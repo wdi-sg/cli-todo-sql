@@ -43,15 +43,26 @@ let queryDoneCallback = (err, result) => {
 // Archive an ID (not delete)
 const archiveItem = (idNo) => {
     const inputNo = parseInt(idNo);
-    // TODO: TEST IF The index exists in the DB.
     if (isNaN(idNo)) {
         console.log('Error please put in a valid number');
+        client.end();
         return;
     }
-    let text = "UPDATE items SET archived=NOT archived, dateupdated=$1 WHERE id=$2 RETURNING *"
-    const date = new Date();
-    const values = [date, inputNo];
-    client.query(text, values, queryDoneCallback);
+    // TEST IF The index exists in the DB.
+    let testIndexText = "SELECT * FROM items WHERE id=$1";
+    const testIndexValues = [inputNo]
+    client.query(testIndexText, testIndexValues, (err, result) => {
+        if (result.rows.length) {
+            let text = "UPDATE items SET archived=NOT archived, dateupdated=$1 WHERE id=$2 RETURNING *"
+            const date = new Date();
+            const values = [date, inputNo];
+            client.query(text, values, queryDoneCallback);
+        } else {
+            console.log(`ERROR! ERROR! ERROR!`);
+            console.log(`Item ID No. ${idNo} does not exist in the database.`);
+            client.end();
+        }
+    })
 }
 
 
@@ -60,8 +71,8 @@ const listItems = () => {
     let listText = "SELECT * FROM items ORDER BY id";
     client.query(listText, (error, result) => {
         if (error) {
-          console.log('Error!', error);
-          client.end();
+            console.log('Error!', error);
+            client.end();
         };
 
         let displayTable = new AsciiTable('TO-DO LIST');
@@ -88,51 +99,73 @@ const listItems = () => {
 
 // Parser for the different statistics functions.
 const displayStatistics = (inputArg) => {
-  switch (inputArg) {
-    case 'complete-time':
-      displayAvgCompletionTime();
-      break;
-    default:
-    console.log('Not a valid statistic to show.');
-    break;
-  }
+    switch (inputArg) {
+        case 'complete-time':
+            displayAvgCompletionTime();
+            break;
+        default:
+            console.log('Not a valid statistic to show.');
+            break;
+    }
 }
 
 
 // node todo.js stats complete-time give the average completion time of all items
 const displayAvgCompletionTime = () => {
-  const queryString = "SELECT * FROM items ORDER BY id";
+    const queryString = "SELECT * FROM items ORDER BY id";
 }
 
 
 
 // Delete an item at index.
-const deleteItem = (inputNo) => {
-    inputNo = parseInt(inputNo);
-    if (isNaN(inputNo)) {
+const deleteItem = (idNo) => {
+    const inputNo = parseInt(idNo);
+    if (isNaN(idNo)) {
         console.log('Error please put in a valid number');
+        client.end();
         return;
     }
-    let deleteText = "DELETE FROM items WHERE id=$1";
-    const values = [inputNo];
-    client.query(deleteText, values, queryDoneCallback);
+    // TEST IF The index exists in the DB.
+    let testIndexText = "SELECT * FROM items WHERE id=$1";
+    const testIndexValues = [inputNo];
+    client.query(testIndexText, testIndexValues, (err, result) => {
+        if (result.rows.length) {
+            inputNo = parseInt(inputNo);
+            let deleteText = "DELETE FROM items WHERE id=$1";
+            const values = [inputNo];
+            client.query(deleteText, values, queryDoneCallback);
+        } else {
+            console.log(`ERROR! ERROR! ERROR!`);
+            console.log(`Item ID No. ${idNo} does not exist in the database.`);
+            client.end();
+        }
+    })
 }
 
 
 // Mark item as done.
 const markedDone = (idNo) => {
-    const inputNo = parseInt(idNo);
-
-    // TODO: TEST IF The index exists in the DB.
-
+    // TEST IF The index exists in the DB.
+    let testIndexText = "SELECT * FROM items WHERE id=$1";
+    const testIndexValues = [idNo]
     if (isNaN(idNo)) {
         console.log('Error please put in a valid number');
+        client.end();
         return;
-    }
-    let text = "UPDATE items SET isdone = NOT isdone, dateupdated=$1 WHERE id=$2 RETURNING *"
-    const date = new Date();
-    const values = [date, inputNo];
-    client.query(text, values, queryDoneCallback);
+    };
+    const inputNo = parseInt(idNo);
+    client.query(testIndexText, testIndexValues, (err, result) => {
+        if (result.rows.length) {
+            let text = "UPDATE items SET isdone = NOT isdone, dateupdated=$1 WHERE id=$2 RETURNING *"
+            const date = new Date();
+            const values = [date, inputNo];
+            client.query(text, values, queryDoneCallback);
+        } else {
+            console.log(`ERROR! ERROR! ERROR!`);
+            console.log(`Item ID No. ${idNo} does not exist in the database.`);
+            client.end();
+        }
+    })
 }
 
 
