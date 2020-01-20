@@ -113,25 +113,29 @@ const displayStatistics = (inputArg) => {
 const displayAvgCompletionTime = () => {
     const queryString = "SELECT * FROM items WHERE isdone = true";
     client.query(queryString, (err, result) => {
-      if (result.rows.length) {
-        let timeToCompletion = 0;
-        for (const item of result.rows) {
-          let dateCreated = item.datecreated;
-          if (!dateCreated) { continue };
-          dateCreated = dateCreated.getTime();
-          let dateUpdated = item.dateupdated;
-          if (!dateUpdated) { continue };
-          dateUpdated = dateUpdated.getTime();
-          timeToCompletion += Math.abs(dateUpdated - dateCreated);
+        if (result.rows.length) {
+            let timeToCompletion = 0;
+            for (const item of result.rows) {
+                let dateCreated = item.datecreated;
+                if (!dateCreated) {
+                    continue
+                };
+                dateCreated = dateCreated.getTime();
+                let dateUpdated = item.dateupdated;
+                if (!dateUpdated) {
+                    continue
+                };
+                dateUpdated = dateUpdated.getTime();
+                timeToCompletion += Math.abs(dateUpdated - dateCreated);
+            }
+            timeToCompletion = (timeToCompletion / result.rows.length);
+            console.log(`It has on average taken ${timeToCompletion} ms between making a task and completing it.`);
+            console.log(`The requirements didn't state it had to be a useful unit of measurement.`);
+            client.end();
+        } else {
+            console.log(`No tasks have been completed`);
+            client.end();
         }
-        timeToCompletion = (timeToCompletion/result.rows.length);
-        console.log(`It has on average taken ${timeToCompletion} ms between making a task and completing it.`);
-        console.log(`The requirements didn't state it had to be a useful unit of measurement.`);
-        client.end();
-      } else {
-        console.log(`No tasks have been completed`);
-        client.end();
-      }
     })
 }
 
