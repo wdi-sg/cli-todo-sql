@@ -20,10 +20,10 @@ let queryDoneCallback = (err, result) => {
                 console.log("result", result.rows );
             break;
             case "add":
-                console.log("Added $1 to To-Do-List")
+                console.log("Added "+process.argv[3]+" to To-Do-List")
             break;
             case "done":
-                console.log(result.rows[0].name + " task done.")
+                console.log("Task "+process.argv[3]+". done.")
             break;
             default:
             console.log("Something is wrong in queryDoneCallback")
@@ -36,8 +36,8 @@ let clientConnectionCallback = (err) => {
     if( err ){
         console.log( "error", err.message );
     }
-let text;
-let values = [];
+    let text;
+    let values = [];
     switch (process.argv[2].toLowerCase()) {
         case "show":
             text = "SELECT * FROM items ORDER BY id ASC";
@@ -47,8 +47,8 @@ let values = [];
             values = [process.argv[3]];
         break;
         case "done":
-            text = "UPDATE items SET done=true WHERE id=$1 RETURNING *"
-            values = process.argv[3];
+            text = "UPDATE items SET done=true WHERE id=$1 RETURNING name"
+            values = [process.argv[3]];
         break;
         default:
         console.log("Something is wrong")
