@@ -2,5 +2,5 @@
 .svn
 *~
 .*.swp
-node modules
+node_modules
 
