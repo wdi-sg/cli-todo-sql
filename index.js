@@ -1,4 +1,4 @@
-console.log("works!!", process.argv[2]);
+// console.log("works!!", process.argv[2]);
 
 const pg = require('pg');
 
@@ -9,46 +9,75 @@ const configs = {
     port: 5432,
 };
 
-
+let checked = '[X]';
+let unchecked = '[ ]';
 
 const client = new pg.Client(configs);
 
-let queryDoneCallback = (err, result) => {
-
-    if (err) {
-      console.log("query error", err.message);
-    }
-
-    else {
-        // console.log(result) - this is an array of objects
-      for (let i = 0; i < result.rows.length; i++) {
-      console.log(result.rows[i].id + ' [ ] - ' + result.rows[i].name);
-      }
-    }
-
-    client.end();
-
-};
 
 
+let queryDoneCallbackForUnchecked = (err, result) => {
 
-let clientConnectionCallback = (err) => {
+        if (err) {
+            console.log("query error", err.message);
+        }
 
-  if (err) {
-    console.log( "error", err.message );
-  }
+        else {
+            // console.log(result) - this is an array of objects
+            for (let i = 0; i < result.rows.length; i++) {
+                console.log(result.rows[i].id + '.' + unchecked + ' - ' + result.rows[i].name);
+            }
+        }
 
-    let actionWord = process.argv[2];
-    let task = process.argv[3];
+            client.end();
+        };
 
-  if (actionWord === "add") {
 
-    let queryString = "INSERT INTO items (name) VALUES ($1) RETURNING *";
-    const values = [task];
 
-    client.query(queryString, values, queryDoneCallback);
+let queryDoneCallbackForChecked = (err, result) => {
 
-  }
-};
+        if (err) {
+            console.log("query error", err.message);
+        }
 
-client.connect(clientConnectionCallback);
+        else {
+
+                for (let i = 0; i < result.rows.length; i++) {
+                    result.rows[i].status = true;
+                    task = result.rows[i].id;
+                    console.log(result.rows[i].id + '.' + checked + ' - ' + result.rows[i].name);
+                }
+            }
+
+            client.end();
+        };
+
+
+
+        let clientConnectionCallback = (err, resultOne, resultTwo) => {
+
+            if (err) {
+                console.log("error", err.message);
+            }
+
+            let thirdWord = process.argv[2];
+            let forthWord = process.argv[3];
+
+            if (thirdWord === "add") {
+                let queryString = "INSERT INTO items (name) VALUES ($1) RETURNING *";
+                const values = [forthWord];
+
+                client.query(queryString, values, queryDoneCallbackForUnchecked);
+            }
+
+            if (thirdWord === "done") {
+                let queryString = "UPDATE items SET (status) VALUES ($1) AND WHERE (id) VALUES ($2) RETURNING *";
+                const valueStatus = [true];
+                const valueId = forthWord;
+
+                client.query(queryString, valueStatus, valueId, queryDoneCallbackForChecked);
+            }
+        };
+
+
+        client.connect(clientConnectionCallback);
