@@ -34,44 +34,45 @@ const client = new pg.Client(configs);
 // };
 
 let clientConnectionCallback = (err) => {
-//--------------------SHOW TABLE------------------
-    if(process.argv[2] === "show"){
-        client.connect((err) => {
+    //--------------------SHOW TABLE------------------
+    if (process.argv[2] === "show") {
+        // client.connect((err) => {
 
-          if( err ){
-            console.log( "error", err.message );
-          }
-
-          const text = 'SELECT * FROM items'
-
-          client.query(text, (err, res) => {
             if (err) {
-              console.log("query error", err.message);
-            } else {
-              console.log("result", res.rows);
-              client.end();
+                console.log("eerror", err.message);
             }
-          });
 
+            const text = 'SELECT * FROM items'
+
+            client.query(text, (err, res) => {
+                if (err) {
+                    console.log("query error", err.message);
+                } else {
+                    for (var i = 0; i < res.rows.length; i++) {
+                        console.log(res.rows[i].id+". [ ]  "+res.rows[i].name)
+                    }
+                    // console.log("result", res.rows);
+                    client.end();
+                }
+            });
+
+        // });
+    }
+    //----------------------ADD ITEMS-----------------
+    if (process.argv[2] === "add") {
+        let queryText = 'INSERT INTO items (name) VALUES ($1)';
+
+        let values = [process.argv[3]];
+        console.log(values)
+        client.query(queryText, values, (err, res) => {
+            if (err) {
+                console.log("query error", err.message);
+            } else {
+                console.log("created!")
+                client.end();
+            }
         });
+    } else {
     }
-//----------------------ADD ITEMS-----------------
-    if( process.argv[2] === "add"){
-    let queryText = 'INSERT INTO items (name) VALUES ($1)';
-
-    let values = [process.argv[3]];
-    console.log(values)
-    client.query(queryText, values, (err, res) => {
-        if (err) {
-          console.log("query error", err.message);
-        } else {
-            console.log("created!")
-            client.end();
-        }
-    });
-    }
-    else{
-        console.log("error")
-    }
- };
+};
 client.connect(clientConnectionCallback);
