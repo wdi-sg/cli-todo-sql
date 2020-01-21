@@ -17,7 +17,13 @@ let queryDoneCallback = (err, result) => {
         }
         switch (process.argv[2].toLowerCase()) {
             case "show":
-                console.log("result", result.rows );
+                for (let i = 0; i < result.rows.length; i++) {
+                    if (result.rows[i].done) {
+                        console.log(result.rows[i].id + ". " + result.rows[i].name + " [ X ].");
+                    } else {
+                        console.log(result.rows[i].id + ". " + result.rows[i].name + " [   ].");
+                    }
+                }
             break;
             case "add":
                 console.log("Added '"+result.rows[0].name+"' to To-Do-List")
