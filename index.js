@@ -71,11 +71,11 @@ let queryDoneCallbackForChecked = (err, result) => {
             }
 
             if (thirdWord === "done") {
-                let queryString = "UPDATE items SET (status) VALUES ($1) AND WHERE (id) VALUES ($2) RETURNING *";
-                const valueStatus = [true];
-                const valueId = forthWord;
+                //assigning $1 as a variable, to make it more dynamic
+                let queryString = "UPDATE items SET status=true WHERE (id=$1) RETURNING *";
+                const values = [forthWord];
 
-                client.query(queryString, valueStatus, valueId, queryDoneCallbackForChecked);
+                client.query(queryString, values, queryDoneCallbackForChecked);
             }
         };
 
