@@ -24,21 +24,13 @@ let queryDoneCallback = (err, result) => {
         } else {
             done = "[x]";
         }
+
         let obj = result.rows[i];
 
         if (obj.archived === null){
             console.log(`${obj.id}. ${done} - ${obj.name} created at: ${obj.created_at}` );
         }
       }
-    }
-    client.end();
-};
-
-let queryInsert = (err, result) => {
-    if (err) {
-      console.log("query error", err.message);
-    } else {
-      console.log(`${result.rows[0].id}. [ ] - ${result.rows[0].name}`);
     }
     client.end();
 };
@@ -58,7 +50,7 @@ let clientConnectionCallback = (err) => {
 
     if(process.argv[2] === "add"){
         let text = `INSERT INTO items (name,completed,created_at) VALUES ($1,false,CURRENT_TIMESTAMP) RETURNING *`;
-        client.query(text, values, queryInsert);
+        client.query(text, values, queryDoneCallback);
     }
 
     if(process.argv[2] === "done"){
