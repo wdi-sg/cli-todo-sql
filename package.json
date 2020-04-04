@@ -1,0 +1,27 @@
+{
+  "name": "cli-todo-sql",
+  "version": "1.0.0",
+  "description": "![https://i.giphy.com/media/26ufnwz3wDUli7GU0/giphy.webp](https://i.giphy.com/media/26ufnwz3wDUli7GU0/giphy.webp)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kwansing14/cli-todo-sql.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kwansing14/cli-todo-sql/issues"
+  },
+  "homepage": "https://github.com/kwansing14/cli-todo-sql#readme",
+  "dependencies": {
+    "full-icu": "^1.3.1",
+    "jsonfile": "^6.0.1",
+    "luxon": "^1.23.0",
+    "moment": "^2.24.0",
+    "pg": "^8.0.0"
+  },
+  "devDependencies": {}
+}
