@@ -15,6 +15,7 @@ let averageTime = 0;
 let counter = 0;
 let dayCount = 0;
 let newDate = 0;
+let bestWorst = {};
 
 jsonfile.readFile(file, (err, obj) => {
     //----------------------------------show
@@ -76,7 +77,7 @@ jsonfile.readFile(file, (err, obj) => {
             // if(obj[nDay] != undefined) {
             //     obj[nDay] += 1;
             // }
-            console.log(obj)
+            console.log(obj);
             //dateCounter();
         }
     }
@@ -121,6 +122,18 @@ jsonfile.readFile(file, (err, obj) => {
               console.log("On the "+key+", there is "+value+" items added.");
             })
             keyValue(list)
+
+        }
+        //---------------------------------------bestworst
+        if(process.argv[3] == 'best-worst') {
+            console.log(obj.todoItems);
+            console.log(obj.diff);
+            for (let i=0 ; i<obj.todoItems.length ; i++) {
+                bestWorst[obj.todoItems[i]] = obj.diff[i];
+            }
+            console.log(bestWorst);
+            let sorted = Object.keys(bestWorst).sort((a,b) => bestWorst[a]-bestWorst[b])
+            console.log(sorted)
 
         }
     }
