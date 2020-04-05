@@ -1,8 +1,6 @@
 const jsonfile = require('jsonfile');
 const { DateTime } = require("luxon");
 DateTime.local();
-const { Interval } = require("luxon");
-const { Duration }= require("luxon");
 
 
 const file = 'data.json'
@@ -15,13 +13,15 @@ let nMilli = 0;
 let timeTotal = 0;
 let averageTime = 0;
 let counter = 0;
+let dayCount = 0;
+let newDate = 0;
 
 jsonfile.readFile(file, (err, obj) => {
     //----------------------------------show
     if( process.argv[2] == "show") {
 
         console.log(obj)
-
+        console.log(obj[1])
         for (let i=0 ; i<obj.todoItems.length ; i++){
 
             let x = i+1;
@@ -31,10 +31,8 @@ jsonfile.readFile(file, (err, obj) => {
     //------------------------------------clear
     if (process.argv[2] == "clear") {
 
-        obj.brac = [];
-        obj.todoItems = [];
-        obj.date = [];
-        obj.diff = [];
+         obj = {};
+
         console.log(obj)
     }
     //-------------------------------------add
@@ -43,13 +41,23 @@ jsonfile.readFile(file, (err, obj) => {
             obj.brac = [];
             obj.todoItems = [];
             obj.date = [];
+            obj.milli = [];
             obj.diff = [];
+            obj.day = [];
+            obj.addTime = {};
 
             createDate();
+
+
             obj.brac.push("[ ]");
             obj.todoItems.push(process.argv[3]);
             obj.date.push(nDate);
-            obj.diff.push(nMilli);
+            obj.milli.push(nMilli);
+            obj.day.push(nDay);
+
+            obj.addTime[nDay] = 1;
+
+            console.log(obj);
         }
         else {
 
@@ -57,7 +65,19 @@ jsonfile.readFile(file, (err, obj) => {
             obj.brac.push("[ ]");
             obj.todoItems.push(process.argv[3]);
             obj.date.push(nDate);
-            obj.diff.push(nMilli);
+            obj.milli.push(nMilli);
+            obj.day.push(nDay);
+
+            obj.addTime[nDay] += 1;
+            // if(obj[nDay] == undefined) {
+            //     obj[nDay] = 1;
+            //     newDate += 1;
+            // }
+            // if(obj[nDay] != undefined) {
+            //     obj[nDay] += 1;
+            // }
+            console.log(obj)
+            //dateCounter();
         }
     }
     //---------------------------------------done
@@ -65,8 +85,8 @@ jsonfile.readFile(file, (err, obj) => {
         let i = process.argv[3] - 1;
         obj.brac[i] = "[x]"; //mark X
 
-        createDate();
-        let timeDiff = (nMilli - parseInt(obj.diff[i])); //calculate difference
+        createDate(); //create nMilli and nDate
+        let timeDiff = (nMilli - parseInt(obj.milli[i])); //calculate difference
         obj.diff[i] = timeDiff; //replace with timeDifference in milliseconds
         obj.date[i] = nDate;    //replace with new Date.
 
@@ -81,17 +101,28 @@ jsonfile.readFile(file, (err, obj) => {
 
         if(process.argv[3] == 'complete-time') {
             for(let i=0 ; i<obj.todoItems.length ; i++) {
-                if(obj.brac[i]="[x]") {
+                if(obj.brac[i] == "[x]") {
                     timeTotal += obj.diff[i]; //add list that has done
                     counter++;
-                    console.log(milliConvert(obj.diff[i])); //display all completion time
+                    console.log((i+1)+". Completed time: "+milliConvert(obj.diff[i])); //display all completion time
                 }
             }
             averageTime = timeTotal/counter;
             averageTime = milliConvert(averageTime);  //convert average time to 0:16:11
             console.log("Average completion time for "+counter+" items, "+averageTime)
         }
+        //---------------------------------------add time
+        if(process.argv[3] == 'add-time') {
+            console.log(obj)
+            console.log(obj.addTime)
+            let list = obj.addTime;
 
+            const keyValue = (input) => Object.entries(input).forEach(([key,value]) => {
+              console.log("On the "+key+", there is "+value+" items added.");
+            })
+            keyValue(list)
+
+        }
     }
 
     jsonfile.writeFile(file, obj, (err) => {
@@ -99,28 +130,23 @@ jsonfile.readFile(file, (err, obj) => {
     });
 });
 
+// let dateCounter = function () {
+//     if(obj[nDay] == undefined) {
+//         obj[nDay] = 1;
+//         newDate += 1;
+//     }
+//     if(obj[nDay] != undefined) {
+//         obj[nDay] += 1;
+//     }
+// }
+
 let createDate = function () {
     dt = DateTime.local();
     var f = {month: 'long', day: 'numeric'};
     nDate = dt.toLocaleString(DateTime.DATETIME_MED);
     nMilli = dt.toMillis();
-    //console.log(nMilli)
+    nDay = dt.toFormat('dd LLL');
 }
-//createDate();
-
-let test = function () {
-    let i1 = DateTime.fromISO('1982-05-25T09:45');
-    let i2 = DateTime.fromISO('1983-10-14T10:30');
-    console.log(i1)
-    // console.log(typeof i1)
-    // console.log(typeof i2)
-    // console.log(i2.diff(i1).toObject()) //=> { milliseconds: 43807500000 }
-    // console.log(i2.diff(i1, 'hours').toObject()) //=> { hours: 12168.75 }
-    // console.log(i2.diff(i1, ['months', 'days']).toObject()) //=> { months: 16, days: 19.03125 }
-    // console.log(i2.diff(i1, ['months', 'days', 'hours']).toObject()) //=> { months: 16, days: 19, hours: 0.75 }
-
-}
-//test();
 
 let milliConvert = function (x) {
     ms = parseInt(x);
@@ -128,4 +154,8 @@ let milliConvert = function (x) {
     let d = new Date(ms);
     newMs = d.getUTCHours()+':'+d.getUTCMinutes()+':'+d.getUTCSeconds(); // "4:59"
     return newMs;
+}
+
+function sortNumber(a, b) {
+  return a - b;
 }
