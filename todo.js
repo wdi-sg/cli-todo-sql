@@ -16,6 +16,8 @@ let counter = 0;
 let dayCount = 0;
 let newDate = 0;
 let bestWorst = {};
+let between = [];
+let between2 = [];
 
 jsonfile.readFile(file, (err, obj) => {
     //----------------------------------show
@@ -137,7 +139,41 @@ jsonfile.readFile(file, (err, obj) => {
 
         }
     }
+    //--------------------------------------betweeeeeen
+    if(process.argv[2] == 'between') {
+        let date1 = process.argv[3];
+        let date2 = process.argv[4];
 
+        date1 = date1.split('/');
+        date2 = date2.split('/');
+
+        let msDate1 = DateTime.local(parseInt("20"+date1[2]),parseInt(date1[1]),parseInt(date1[0])).toMillis();
+        let msDate2 = DateTime.local(parseInt("20"+date2[2]),parseInt(date2[1]),parseInt(date2[0])).toMillis();
+
+        console.log(msDate1);
+        console.log(msDate2);
+        console.log(obj)
+
+        for(let i=0 ; i<obj.milli.length ; i++) {
+            if(obj.milli[i] > msDate1 && obj.milli[i] < msDate2) { //items added
+                between.push(obj.todoItems[i]);
+            }
+            if(obj.milli[i] > msDate1 && obj.milli[i] < msDate2 && obj.brac[i] == '[x]') { //items completed
+                between2.push(obj.todoItems[i]);
+            }
+        }
+        console.log("=======Between "+process.argv[4]+" and "+process.argv[5]+"==============")
+        console.log("=============Items============")
+        //between.forEach((x) => console.log(x));
+        for(let i=0; i<between.length; i++){
+            console.log(i+". "+between[i]);
+        }
+        console.log("========Completed Items========")
+        for(let i=0; i<between2.length; i++){
+            console.log(i+". "+between2[i]);
+        }
+        console.log("===============================================")
+    }
     jsonfile.writeFile(file, obj, (err) => {
         console.log(err)
     });
