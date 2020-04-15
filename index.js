@@ -60,8 +60,16 @@ let clientConnectionCallback = (err) => {
         }
 
         let text = "select * from items";
-
-        client.query(text, queryDoneCallback);
+        client.query(text, (err,result) => {
+          for(let i = 0; i< result.rows.length; i++){
+            let id = result.rows[i].id;
+            let name = result.rows[i].name;
+            let status = result.rows[i].status;
+            let created = result.rows[i].created;
+            let completed = result.rows[i].completed;
+            console.log(`${id}.${name} - ${status} created : ${created} | completed : ${completed}`)
+          }
+        })
     }
 };
 
