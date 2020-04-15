@@ -5,5 +5,6 @@ CREATE TABLE IF NOT EXISTS to_do_items (
 	time_stamp VARCHAR (30) NOT NULL,
 	updated_time_stamp VARCHAR (30),
 	item VARCHAR (50) NOT NULL,
-	done boolean
+	done boolean,
+	archived boolean
 );
