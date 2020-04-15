@@ -29,10 +29,10 @@ let queryDoneCallback = (err, result) => {
         for (let i = 0; i < res.rows.length; i++) {
           var record = res.rows[i];
           if (record.done == false) {
-            var string = `${i + 1}. [ ] ${record.name}\n`;
+            var string = `${i + 1}. [ ] - ${record.name}\n`;
             outList += string;
           } else {
-            var string = `${i + 1}. [X] ${record.name}\n`;
+            var string = `${i + 1}. [X] - ${record.name}\n`;
             outList += string;
           }
         }
@@ -78,9 +78,11 @@ let clientConnectionCallback = (err) => {
         const values = [inputArr[id], "f"];
         client.query(text, values, queryDoneCallback);
       }
-      
       break;
-
+    case "show":
+      let queryText = 'SELECT * FROM items';
+      client.query(queryText, queryDoneCallback);
+      break;
     default:
       break;
   }
