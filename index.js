@@ -63,6 +63,34 @@ let queryDoneCallbackAverage = (err, result) => {
 };
 
 
+let queryDoneCallbackTask = (err, result) => {
+
+    if (err) {
+      console.log("query error", err.message);
+    } else {
+      //console.log("result", result.rows );
+      let numberOfTask=result.rows.length;
+      let sum=0;
+      let createdTime=[]
+      for(let count=0; count<result.rows.length; count++)
+      {
+        if ( result.rows[count].created_second!==null)
+        {
+          createdTime.push(result.rows[count].created_second);
+        }
+      }
+
+      let maxTime= Math.max(...createdTime);
+      let minTime= Math.min(...createdTime);
+      console.log("Max time is "+ maxTime + " Min Time is "+ minTime);
+      let totalTime= (maxTime-minTime)/86400;
+      let averageTaskAdd=numberOfTask/totalTime;
+      console.log(`The number of task added per day in ${totalTime} days is ${averageTaskAdd} task/day`);
+    }
+    client.end();
+};
+
+
 ///////// adding Task
 let addTask=()=>{
   let timeSecond=new Date();
@@ -121,8 +149,20 @@ let doneTask=()=>{
 
 let computeAverage=()=>{
   let text="SELECT * FROM items";
-  client.query(text, queryDoneCallbackAverage);
+  if(process.argv[3].toLowerCase()==="complete-time")
+    {
+      client.query(text, queryDoneCallbackAverage);
+    }
+  if(process.argv[3].toLowerCase()==="add-time")
+    {
+      client.query(text, queryDoneCallbackTask);
+    }
 }
+
+
+
+
+
 
 let clientConnectionCallback = (err) => {
 
@@ -159,11 +199,12 @@ if(process.argv[2].toLowerCase()==="archive")
 }
 if(process.argv[2].toLowerCase()==="stats")
 {
-  if(process.argv[3].toLowerCase()==="complete-time")
-  {
+
     computeAverage();
+
+
     return;
-  }
+
 }
 };
 
