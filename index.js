@@ -14,6 +14,15 @@ const client = new pg.Client(configs);
 
 let inputArr = process.argv;
 // console.log(inputArr);
+let timeDiff = false;
+
+function convertTime(timeInMS) {
+  let timeInS = timeInMS / 1000;
+  let hours = Math.floor(timeInS / 3600);
+  let minutes = Math.floor(timeInS / 60) % 60;
+  let seconds  = timeInS % 60;
+  return `${hours}h : ${minutes}m : ${seconds}s`;
+}
 
 let queryDoneShowAll = (err, result) => {
   if (err) {
@@ -23,14 +32,18 @@ let queryDoneShowAll = (err, result) => {
       let list = result.rows;
       let displayText;
       if (list[i].done === null) {
-        displayText = `${list[i].id}. [ ] - ${list[i].item} - ${list[i].created_at}`;
+        displayText = `${list[i].id}. [ ] - ${list[i].item} - CREATED AT: ${list[i].created_at}`;
       } else {
-        displayText = `${list[i].id}. [${list[i].done}] - ${list[i].item} - ${list[i].created_at}`;
+        let diff = list[i].updated_at - list[i].created_at;
+        let timeDiff = convertTime(parseInt(diff));
+        displayText = `${list[i].id}. [${list[i].done}] - ${list[i].item} - CREATED AT: ${list[i].created_at} - UPDATED AT: ${list[i].updated_at} - COMPLETE TIME: ${timeDiff}`;
+        let queryText = `UPDATE todolist SET complete_time='${timeDiff}' WHERE id='${list[i].id}'`;
+        client.query(queryText, queryDoneDoNth);
       }
       console.log(displayText);
     }
   }
-  client.end();
+  // client.end();
 };
 
 let queryDoneDoNth = (err, result) => {
@@ -54,7 +67,8 @@ let clientConnectionCallBack = (err) => {
     client.query(queryText, queryDoneShowAll);
 
   } else if (inputArr[2] === "done") {
-    let queryText = `UPDATE todolist SET done='X' WHERE id='${inputArr[3]}'`;
+    let now = new Date().toUTCString();
+    let queryText = `UPDATE todolist SET done='X', updated_at='${now}' WHERE id='${inputArr[3]}'`;
     client.query(queryText, queryDoneDoNth);
     queryText = "SELECT * from todolist ORDER BY id ASC";
     client.query(queryText, queryDoneShowAll);
