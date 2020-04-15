@@ -36,16 +36,19 @@ const checkConnection = async function () {
   if (!connected) {
     await connectSql();
   }
-  let options  = {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    hour12: false,
-    hour: "numeric",
-    minute: "numeric",
-  };
-  let dateStr = new Intl.DateTimeFormat('default', options).format(dateObj);
-  return dateStr;
+};
+
+const makeIdMap = async function () {
+  let query = "SELECT id, archived FROM items ORDER BY id";
+  let results = await client.query(query);
+  let items = results.rows.filter(e => e.archived === false);
+
+  let idMap = {};
+  for (let i = 1; i <= items.length; i++) {
+    idMap[i] = items[i-1].id;
+  }
+
+  return idMap;
 };
 
 // todo manipulation functions
