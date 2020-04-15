@@ -20,15 +20,101 @@ const rl = readline.createInterface({
   prompt: "What would you like to do? "
 });
 
+// moment
+const mo = require('moment');
+
 // sql functions
 const connectSql = function () {
   return client.connect();
 };
+
+//helper functions
+const parseDate = function (dateObj) {
+  if (dateObj === "") {
+    return "";
+  }
+  let options  = {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    hour12: false,
+    hour: "numeric",
+    minute: "numeric",
+  };
+  let dateStr = new Intl.DateTimeFormat('default', options).format(dateObj);
+  return dateStr;
+};
+
+// todo manipulation functions
+const showItems = async function () {
+  let query = "SELECT * FROM items";
+  let results = await connectSql().then(() => client.query(query));
+  let items = results.rows;
+
+  let idMap = {};
+  for (let i = 1; i <= items.length; i++) {
+    idMap[i] = items[i-1].id;
+  }
+  console.log(idMap);
+
+  let heading = [
+    "S/N",
+    "Done".padEnd(4),
+    "Item".padEnd(29, " "),
+    "Created at".padEnd(20, " "),
+    "Updated at".padEnd(20, " "),
+  ];
+  console.log("\n", heading.join(" "));
+  console.log("-".repeat(80));
+
+  for (let num in idMap) {
+    let item = items.filter(e => e.id === idMap[num])[0];
+    let index = String(num).padStart(3, " ");
+    let done = item.done ? "[x] " : "[ ] ";
+    let title = item.name.padEnd(29, " ");
+    let cDateObj = new Date(item.created);
+    let cDateStr = mo(cDateObj).fromNow().padEnd(20);
+    let uDateObj = (item.updated === null) ? "" : new Date(item.updated);
+    let uDateStr = parseDate(uDateObj).padEnd(20);
+    console.log(index, done, title, cDateStr, uDateStr);
   }
 
-  let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
+  rl.prompt();
+};
 
-  const values = ["hello"];
+const addItem = function () {
+  console.log("add an item");
+  return;
+};
+
+const archiveItem = function () {
+  console.log("archive item");
+  return;
+};
+
+const markDone = function () {
+  console.log("mark item done");
+  return;
+};
+
+const getStat = function () {
+  console.log("get stats");
+  return;
+};
+
+// help display
+const showHelp = function () {
+  console.log(
+    "Usage:\n" +
+      "show: show all items in list\n" +
+      "add 'string': add an item named string\n" +
+      "done <num>: mark item <num> done\n" +
+      "archive <num>: archive item <num>\n" +
+      "stats [comp-time|add-time|best-worst|add-bet|done-bet]: get stats\n" +
+      "help: show this help"
+  );
+  rl.prompt();
+};
 
 const despatch = {
   "help": showHelp,
