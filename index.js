@@ -20,8 +20,10 @@ const rl = readline.createInterface({
   prompt: "What would you like to do? "
 });
 
-  if( err ){
-    console.log( "error", err.message );
+// sql functions
+const connectSql = function () {
+  return client.connect();
+};
   }
 
   let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
