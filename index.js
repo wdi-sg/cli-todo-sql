@@ -67,9 +67,9 @@ const showItems = async function () {
   let heading = [
     "S/N",
     "Done".padEnd(4),
-    "Item".padEnd(29, " "),
-    "Created at".padEnd(20, " "),
-    "Updated at".padEnd(20, " "),
+    "Item".padEnd(37, " "),
+    "Created at".padEnd(16, " "),
+    "Updated at".padEnd(16, " "),
   ];
   console.log("\n", heading.join(" "));
   console.log("-".repeat(80));
@@ -78,11 +78,12 @@ const showItems = async function () {
     let item = items.filter(e => e.id === idMap[num])[0];
     let index = String(num).padStart(3, " ");
     let done = item.done ? "[x] " : "[ ] ";
-    let title = item.name.padEnd(29, " ");
-    let cDateObj = new Date(item.created);
-    let cDateStr = mo(cDateObj).fromNow().padEnd(20);
-    let uDateObj = (item.updated === null) ? "" : new Date(item.updated);
-    let uDateStr = parseDate(uDateObj).padEnd(20);
+    let title = item.name.padEnd(37, " ");
+    let cDateStr = mo(new Date(item.created)).fromNow().padEnd(16);
+    let uDateStr =
+        (item.updated === null) ?
+        "" :
+        mo(new Date(item.updated)).fromNow().padEnd(16);
     console.log(index, done, title, cDateStr, uDateStr);
   }
 
