@@ -1,36 +1,27 @@
-console.log("works!!", process.argv[2]);
+const log = console.log;
+const pool = require('./db/pool');
+const clear = require('clear');
+const chalk = require('chalk');
+const figlet = require('figlet');
+// const prompt = require('./utils/prompts');
+const DB = require('./db/db')
+// const {TodoList, TodoItem} = require('./todo');
 
-const pg = require('pg');
+const TAG_LINE = 'DO IT !'
+let todoList;
 
-const configs = {
-    user: 'akira',
-    host: '127.0.0.1',
-    database: 'todo',
-    port: 5432,
-};
+const displayWelcomeText = () => {
+  const options = { font: 'Star Wars', horizontalLayout: 'full' }
+  log(chalk.blueBright(figlet.textSync(TAG_LINE,options)))
+}
 
-const client = new pg.Client(configs);
+const init = () => {
+  clear();
+  const db = new DB()
+}
 
-let queryDoneCallback = (err, result) => {
-    if (err) {
-      console.log("query error", err.message);
-    } else {
-      console.log("result", result.rows );
-    }
-    client.end();
-};
+const run = async () => {
+  init();
+}
 
-let clientConnectionCallback = (err) => {
-
-  if( err ){
-    console.log( "error", err.message );
-  }
-
-  let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
-
-  const values = ["hello"];
-
-  client.query(text, values, queryDoneCallback);
-};
-
-client.connect(clientConnectionCallback);
+run();
