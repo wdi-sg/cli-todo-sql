@@ -99,7 +99,9 @@ const addItem = async function (line) {
   let args = line.split(" ");
   let item = args.splice(1, args.length - 1).join(" ");
   let values = [item, false, mo().format(), false];
-  let query = "INSERT INTO items (name, done, created, archived) VALUES ($1, $2, $3, $4) RETURNING id";
+  let query =
+      "INSERT INTO items (name, done, created, archived) " +
+      "VALUES ($1, $2, $3, $4) RETURNING id";
   let results = await client.query(query, values);
 
   showItems();
