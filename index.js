@@ -24,7 +24,6 @@ const rl = readline.createInterface({
 const mo = require('moment');
 
 // global variables
-let idMap = {};
 let connected = false;
 
 // sql functions
@@ -50,17 +49,6 @@ const parseDate = function (dateObj) {
   return dateStr;
 };
 
-const updateMap = async function () {
-  let query = "SELECT * FROM items";
-  let results = await client.query(query);
-  let items = results.rows;
-
-  for (let i = 1; i <= items.length; i++) {
-    idMap[i] = items[i-1].id;
-  }
-  console.log(idMap);
-};
-
 // todo manipulation functions
 const showItems = async function () {
   if (!connected) {
@@ -71,6 +59,7 @@ const showItems = async function () {
   let results = await client.query(query);
   let items = results.rows;
 
+  let idMap = {};
   for (let i = 1; i <= items.length; i++) {
     idMap[i] = items[i-1].id;
   }
@@ -111,8 +100,7 @@ const addItem = async function (line) {
   let query = "INSERT INTO items (name, done, created, archived) VALUES ($1, $2, $3, $4) RETURNING id";
   let results = await client.query(query, values);
 
-  updateMap();
-  rl.prompt();
+  showItems();
 };
 
 const archiveItem = function () {
