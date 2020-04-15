@@ -12,7 +12,13 @@ const handleError = function (err) {
   console.log("Connect error:", err);
 };
 
-let clientConnectionCallback = (err) => {
+// readline config
+const readline = require('readline');
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  prompt: "What would you like to do? "
+});
 
   if( err ){
     console.log( "error", err.message );
@@ -22,7 +28,29 @@ let clientConnectionCallback = (err) => {
 
   const values = ["hello"];
 
-  client.query(text, values, queryDoneCallback);
+const despatch = {
+  "help": showHelp,
+  "show": showItems,
+  "add": addItem,
+  "done": markDone,
+  "stats": getStat
 };
 
-client.connect(clientConnectionCallback);
+// main program
+rl.prompt();
+
+rl.on('line', (line) => {
+  line = line.trim();
+  if (line.toLowerCase() === 'q') {
+    console.log("\nQuit\n");
+    process.exit(0);
+  } else if (despatch[line.toLowerCase()] === undefined) {
+    console.log(line);
+    line = "help";
+  }
+
+  despatch[line]();
+
+}).on('close', () => {
+  process.exit(0);
+});
