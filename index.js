@@ -78,8 +78,14 @@ let clientConnectionCallback = (err) => {
                 script = `SELECT name, date(created_at) AS MYDATE FROM items;`
                 client.query(script, avgItemsPerDay)
                 break;
+            case 'between':
+                const date1 = process.argv[4];
+                const date2 = process.argv[5];
+                script = `SELECT * FROM items WHERE date(created_at) BETWEEN to_date('${date1}', 'DD/MM/YY') AND to_date('${date2}', 'DD/MM/YY')`;
+                client.query(script, queryDoneCallback);
+                break;
             default:
-                console.log(`Error.`)
+                return console.log(`Error. Stat query not found.`)
                 break;
         }
 
