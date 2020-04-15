@@ -65,6 +65,15 @@ let updateTask=()=>{
 
 }
 
+//////////////////Delete Tasks
+let archiveTask=()=>{
+
+
+  let archivetext = `DELETE  FROM items WHERE id=${parseInt(process.argv[3])}`;
+    client.query(archivetext, queryDoneCallback2);
+  }
+
+
 
 
 
@@ -106,6 +115,13 @@ if(process.argv[2].toLowerCase()==="view")
 if(process.argv[2].toLowerCase()==="update")
 {
   updateTask();
+  return
+}
+  console.log("archive");
+if(process.argv[2].toLowerCase()==="archive")
+{
+
+  archiveTask();
   return
 }
 };
