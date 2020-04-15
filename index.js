@@ -90,6 +90,43 @@ let queryDoneCallbackTask = (err, result) => {
     client.end();
 };
 
+let queryDoneCallbackBestWorst = (err, result) => {
+
+    if (err) {
+      console.log("query error", err.message);
+    } else {
+      //console.log("result", result.rows );
+
+
+          let completedTime=[];
+          let sum=0;
+          let worstTask=""
+          let bestTask=""
+          for(let count=0; count<result.rows.length; count++)
+          {
+            if ( result.rows[count].completedtime!==null)
+            {
+              completedTime.push(result.rows[count].completedtime);
+            }
+          }
+          let bestTime= Math.max(...completedTime);
+          let worstTime= Math.min(...completedTime);
+        for(count=0; count<result.rows.length; count++)
+          {
+            if ( result.rows[count].completedtime===bestTime)
+            {
+              bestTask=result.rows[count].name;
+            }
+            if ( result.rows[count].completedtime===worstTime)
+            {
+              worstTask=result.rows[count].name;
+            }
+          }
+          console.log(`The best timing is ${worstTask} which took ${worstTime} seconds. The worst timing is ${bestTask} which took ${bestTime} seconds.`)
+      }
+    client.end();
+};
+
 
 ///////// adding Task
 let addTask=()=>{
@@ -156,6 +193,10 @@ let computeAverage=()=>{
   if(process.argv[3].toLowerCase()==="add-time")
     {
       client.query(text, queryDoneCallbackTask);
+    }
+    if(process.argv[3].toLowerCase()==="best-worst")
+    {
+      client.query(text, queryDoneCallbackBestWorst);
     }
 }
 
