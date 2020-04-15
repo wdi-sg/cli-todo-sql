@@ -289,19 +289,20 @@ let doneTask=()=>{
 
 let computeAverage=()=>{
   let text="SELECT * FROM items";
-  if(process.argv[3].toLowerCase()==="complete-time")
+  if(process.argv[3].toLowerCase()==="complete-time" || process.argv[3].toLowerCase()==="time")
     {
       client.query(text, queryDoneCallbackAverage);
     }
-  if(process.argv[3].toLowerCase()==="add-time")
+  if(process.argv[3].toLowerCase()==="add-time"|| process.argv[3].toLowerCase()==="task")
     {
       client.query(text, queryDoneCallbackTask);
     }
-    if(process.argv[3].toLowerCase()==="best-worst")
+    if(process.argv[3].toLowerCase()==="best-worst"|| process.argv[3].toLowerCase()==="bw")
     {
       client.query(text, queryDoneCallbackBestWorst);
     }
 }
+
 
 
 let findBetween=()=>{
@@ -382,5 +383,86 @@ console.log(`
 `);
 return;
 };
+
+
+///////Commander input
+function activateReadWrite(word, input)
+{
+
+
+  if(word === "add")
+  {
+
+       addTask();
+      return
+
+    }
+
+
+    if(word === "done" )
+    {
+        doneTask();
+        return
+
+    }
+    if( word === "archive")
+    {
+       archiveTask();
+    return;
+
+    }
+
+    if( word === "compare")
+    {
+       computeAverage();
+    return;
+
+    }
+
+}
+
+
+
+const { program } = require('commander');
+
+    program
+
+        .description("Select an option. '-a value' to add value. -s to show. '-d value' to update what is done. '-ar value' to archive task. '-c time' to find average time. '-c task' to find average task add rate. '-c bw' to find the best and worst time. '-s asc' to sort")
+        .option("-a, --value <type>")
+        .option("-c, --compare <type")
+        .option("-d, --done <type>")
+        .option("-ar, --archive <type>");
+
+    program.parse(process.argv);
+    if( program.value ) activateReadWrite ( "add" , program.value );
+    if (program.compare) activateReadWrite ("compare", program.compare);
+    if ( program.done ) activateReadWrite ( "done" , program.done );
+    if ( program.archive ) activateReadWrite   ( "archive" , program.del );
+
+
+
+    console.log(`
+ ▄▄▄▄▄▄▄▄▄▄▄  ▄▄        ▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄         ▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄        ▄  ▄▄▄▄▄▄▄▄▄▄▄
+▐░░░░░░░░░░░▌▐░░▌      ▐░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░▌      ▐░▌▐░░░░░░░░░░░▌
+ ▀▀▀▀█░█▀▀▀▀ ▐░▌░▌     ▐░▌▐░█▀▀▀▀▀▀▀▀▀  ▀▀▀▀█░█▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌▐░▌       ▐░▌▐░█▀▀▀▀▀▀▀▀▀  ▀▀▀▀█░█▀▀▀▀  ▀▀▀▀█░█▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌▐░▌░▌     ▐░▌▐░█▀▀▀▀▀▀▀▀▀
+     ▐░▌     ▐░▌▐░▌    ▐░▌▐░▌               ▐░▌     ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌▐░▌    ▐░▌▐░▌
+     ▐░▌     ▐░▌ ▐░▌   ▐░▌▐░█▄▄▄▄▄▄▄▄▄      ▐░▌     ▐░█▄▄▄▄▄▄▄█░▌▐░▌       ▐░▌▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌ ▐░▌   ▐░▌▐░█▄▄▄▄▄▄▄▄▄
+     ▐░▌     ▐░▌  ▐░▌  ▐░▌▐░░░░░░░░░░░▌     ▐░▌     ▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌  ▐░▌  ▐░▌▐░░░░░░░░░░░▌
+     ▐░▌     ▐░▌   ▐░▌ ▐░▌ ▀▀▀▀▀▀▀▀▀█░▌     ▐░▌     ▐░█▀▀▀▀█░█▀▀ ▐░▌       ▐░▌▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌   ▐░▌ ▐░▌ ▀▀▀▀▀▀▀▀▀█░▌
+     ▐░▌     ▐░▌    ▐░▌▐░▌          ▐░▌     ▐░▌     ▐░▌     ▐░▌  ▐░▌       ▐░▌▐░▌               ▐░▌          ▐░▌     ▐░▌       ▐░▌▐░▌    ▐░▌▐░▌          ▐░▌
+ ▄▄▄▄█░█▄▄▄▄ ▐░▌     ▐░▐░▌ ▄▄▄▄▄▄▄▄▄█░▌     ▐░▌     ▐░▌      ▐░▌ ▐░█▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄▄▄      ▐░▌      ▄▄▄▄█░█▄▄▄▄ ▐░█▄▄▄▄▄▄▄█░▌▐░▌     ▐░▐░▌ ▄▄▄▄▄▄▄▄▄█░▌
+▐░░░░░░░░░░░▌▐░▌      ▐░░▌▐░░░░░░░░░░░▌     ▐░▌     ▐░▌       ▐░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌     ▐░▌     ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░▌      ▐░░▌▐░░░░░░░░░░░▌
+ ▀▀▀▀▀▀▀▀▀▀▀  ▀        ▀▀  ▀▀▀▀▀▀▀▀▀▀▀       ▀       ▀         ▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀       ▀       ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀        ▀▀  ▀▀▀▀▀▀▀▀▀▀▀
+`);
+console.log(`
+.▄▄ · ▄▄▄ .▄▄▌  ▄▄▄ . ▄▄· ▄▄▄▄▄     ▄▄▄·  ▐ ▄            ▄▄▄·▄▄▄▄▄▪         ▐ ▄
+▐█ ▀. ▀▄.▀·██•  ▀▄.▀·▐█ ▌▪•██      ▐█ ▀█ •█▌▐█    ▪     ▐█ ▄█•██  ██ ▪     •█▌▐█
+▄▀▀▀█▄▐▀▀▪▄██▪  ▐▀▀▪▄██ ▄▄ ▐█.▪    ▄█▀▀█ ▐█▐▐▌     ▄█▀▄  ██▀· ▐█.▪▐█· ▄█▀▄ ▐█▐▐▌
+▐█▄▪▐█▐█▄▄▌▐█▌▐▌▐█▄▄▌▐███▌ ▐█▌·    ▐█ ▪▐▌██▐█▌    ▐█▌.▐▌▐█▪·• ▐█▌·▐█▌▐█▌.▐▌██▐█▌
+ ▀▀▀▀  ▀▀▀ .▀▀▀  ▀▀▀ ·▀▀▀  ▀▀▀      ▀  ▀ ▀▀ █▪     ▀█▄▀▪.▀    ▀▀▀ ▀▀▀ ▀█▄▀▪▀▀ █▪
+`);
+console.log(`'-a value' to add task.\n'-d value' to update what is done.\n'-ar value' to archive task.\n -c time to find average completion time \n -c task to find average add task per day\n -c bw to find best and worst time`);
+
+
 
 client.connect(clientConnectionCallback);
