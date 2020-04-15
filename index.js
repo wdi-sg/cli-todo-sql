@@ -14,8 +14,25 @@ const client = new pg.Client(configs);
 let queryDoneCallback = (err, result) => {
     if (err) {
       console.log("query error", err.message);
-    } else {
-      console.log("result", result.rows );
+    }
+    else {
+      console.log(result.rows);
+      console.log(
+        `
+ ____  _____  ____    __    ____  ___  ____
+(  _ \\(  _  )(  _ \\  (  )  (_  _)/ __)(_  _)
+ ) _ < )(_)(  ) _ <   )(__  _)(_ \\__ \\  )(
+(____/(_____)(____/  (____)(____)(___/ (__)
+
+        `
+        );
+        result.rows.forEach(el => {
+            console.log(`
+${el.name} - [${el.done}]
+created_at: ${el.created_date}
+updated_at: ${el.updated_date}
+            `);
+        })
     }
     client.end();
 };
@@ -31,11 +48,20 @@ let clientConnectionCallback = (err) => {
     client.query(text, queryDoneCallback);
   }
   else if (process.argv[2] === 'add'){
-    let text = "insert into items (name) values ($1) returning id";
+    let text = "insert into items (name, done) values ($1, $2) returning id";
 
-    const values = [process.argv[3]];
+    const values = [process.argv[3], " "];
 
-    client.query(text, values, queryDoneCallback);
+    client.query(text, values, (err, result) => {
+        if (err) {
+            console.log("query error: " + err)
+        }
+        else{
+            console.log("Successfully Added!")
+        }
+
+        client.end();
+    });
   }
 
 };
