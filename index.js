@@ -63,7 +63,24 @@ client.connect((err) => {
             let line = `${res.rows[i].id}. ${res.rows[i].isdone} - ${res.rows[i].task}, Created at: ${res.rows[i].created_at}, Updated at: ${res.rows[i].updated_at}`;
             console.log(line);
           }
+        }
+      });
+    }else if(process.argv[2] === "done"){
+      let date = Date().toString();
+      let queryText = `UPDATE items SET isdone='[x]' WHERE id = ${process.argv[3]}`;
+      let queryText2 = `UPDATE items SET updated_at='${date}' WHERE id = ${process.argv[3]} RETURNING *`;
 
+      client.query(queryText, (err, res) => {
+        if(err){
+          console.log("Error in query: ", err.message);
+        }else {
+          client.query(queryText2, (err, res) => {
+            if(err){
+              console.log("Error in query: ", err.message);
+            }else {
+              console.log(`ID ${res.rows[0].id} has been updated! result: `, res.rows[0]);
+            }
+          });
         }
       });
     }
