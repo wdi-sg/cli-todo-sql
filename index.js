@@ -15,17 +15,17 @@ const client = new pg.Client(configs);
 let inputArr = process.argv;
 console.log(inputArr);
 
-let queryDoneShow = (err, result) => {
+let queryDoneShowAll = (err, result) => {
   if (err) {
     console.log("QUERY ERROR:", err.message);
   } else {
     for (let i = 0; i < result.rows.length; i++) {
-      let obj = result.rows;
+      let list = result.rows;
       let displayText;
-      if (obj[i].done === null) {
-        displayText = `${obj[i].id}. [ ] - ${obj[i].item}`;
+      if (list[i].done === null) {
+        displayText = `${list[i].id}. [ ] - ${list[i].item}`;
       } else {
-        displayText = `${obj[i].id}. [${obj[i].done}] - ${obj[i].item}`;
+        displayText = `${list[i].id}. [${list[i].done}] - ${list[i].item}`;
       }
       console.log(displayText);
     }
@@ -38,7 +38,7 @@ let clientConnectionCallBack = (err) => {
     console.log("CONNECTION ERROR:", err.message);
   } else if (inputArr[2] === "show") {
     let queryText = "SELECT * from todolist";
-    client.query(queryText, queryDoneShow);
+    client.query(queryText, queryDoneShowAll);
   }
 };
 
