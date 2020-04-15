@@ -27,10 +27,10 @@ let clientConnectionCallback = (err) => {
   }
 
 //  let text = "INSERT INTO items (name) VALUES ($1) RETURNING id";
-     let text = "SELECT $1 FROM items"
-  const values = ["*"];
+  //    let text = "SELECT $1 FROM items"
+  // const values = ["*"];
 
-  client.query(text, values, queryDoneCallback);
+  // client.query(text, values, queryDoneCallback);
 };
 
 client.connect(clientConnectionCallback);
@@ -61,7 +61,51 @@ if (process.argv[2] === 'ADD'){
         if (err) {
           console.log("query error", err.message);
         } else {
+          console.log("done the addition!");
+        }
+    });
+}
+
+if (process.argv[2] === 'DONE'){
+    let tempHolder;
+    let afterSplit=[];
+    let queryText = 'SELECT * FROM items WHERE id = $1';
+    const values = [process.argv[3]]
+
+    client.query(queryText, values, (err, res)=> {
+        if (err){
+            console.log("query error", err.message);
+        } else {
+        tempHolder = res.rows[0].name.split("[ ]");
+        afterSplit.push(tempHolder[1]);
+        console.log(afterSplit);
+        }
+    })
+
+    let queryTextOne = "UPDATE items SET name = $2 $3 WHERE id = $1";
+    const valuesOne = [process.argv[3],'[x] -  '];
+    valuesOne.push(afterSplit[0]);
+
+    client.query(queryTextOne, valuesOne, (err, res) => {
+        if (err) {
+          console.log("query error", err.message);
+        } else {
           console.log("done");
+          console.log(res.rows[parseInt(process.argv[3])])
+        }
+    });
+}
+
+if (process.argv[2] === 'DELETE'){
+
+    let queryText = "DELETE FROM items WHERE id= $1";
+    const values = [process.argv[3]]
+
+    client.query(queryText, values, (err, res) => {
+        if (err) {
+          console.log("query error", err.message);
+        } else {
+          console.log("done deleting!");
         }
     });
 }
