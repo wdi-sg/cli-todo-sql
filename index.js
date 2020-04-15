@@ -15,15 +15,19 @@ client.connect((err) => {
     }
 
     let commandType = process.argv[2];
-    let inputTask = process.argv[3];
     let values = [];
     let queryText;
 
     if (commandType === 'show') {
         queryText = 'SELECT * FROM items';
     } else if (commandType === 'add') {
+        let inputTask = process.argv[3];
         values = [inputTask];
         queryText = "INSERT INTO items (done, task) VALUES ('[] -', $1) RETURNING *";
+    } else if (commandType === 'done') {
+        let inputId = process.argv[3];
+        values = [inputId];
+        queryText = "UPDATE items SET done='[x] -' WHERE id=$1 RETURNING *";
     }
 
     client.query(queryText, values, (err, res) => {
