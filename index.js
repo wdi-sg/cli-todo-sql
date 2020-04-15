@@ -33,11 +33,24 @@ const getAvgTime = (err, res) => {
         const theSum = theNums.reduce( (a,b) => a + b );
         const averageMins = (theSum / theNums.length).toFixed(1);
         colorLog('lavender', `Average minutes to complete a task: ${averageMins}`)
-
-        
     }
     client.end();
 };
+
+const bestWorst = (err, res) => {
+
+    err && console.log(`Query error`, err.message)
+
+    const array = res.rows;
+    const best = array.shift();
+    const worst = array.pop();
+    let itemDisplay = item => `${item.id}. ${item.name} | Completed in ${item.mins_diff} mins`
+    let output = `Fastest item: \n ${itemDisplay(best)} \n\n Slowest item: \n ${itemDisplay(worst)}`
+    colorLog('lavender', output);
+
+    client.end();
+
+}
 
 
 const formatDisplay = res => {
@@ -94,14 +107,18 @@ let clientConnectionCallback = (err) => {
     } else if (command==='stats') {
 
         const statQuery = process.argv[3]
+        let script;
+
 
         switch (statQuery) {
             case 'complete-time': 
-
-            const script = `select *,EXTRACT(EPOCH FROM (completed_at - created_at)/60)  as mins_diff from items`
-            client.query(script, getAvgTime);
+                script = `select *,EXTRACT(EPOCH FROM (completed_at - created_at)/60)  as mins_diff from items`
+                client.query(script, getAvgTime);
                 break;
-
+            case 'best-worst':
+                script = `select *,EXTRACT(EPOCH FROM (completed_at - created_at)/60) as mins_diff from items ORDER BY mins_diff ASC`
+                client.query(script, bestWorst)
+                break;
             default:
                 console.log(`Error.`)
                 break;
