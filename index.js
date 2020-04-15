@@ -105,9 +105,21 @@ const addItem = async function (line) {
   showItems();
 };
 
-const archiveItem = function () {
-  console.log("archive item");
-  return;
+const markDone = async function (line) {
+  checkConnection();
+
+  let args = line.split(" ");
+  let idMap = await makeIdMap();
+  let doneId = args.splice(1, args.length - 1).join(" ");
+  let values = [idMap[doneId], mo().format()];
+  let query =
+      "UPDATE items " +
+      "SET done = true, " +
+      "updated = $2" +
+      "WHERE id = $1";
+
+  await client.query(query, values);
+  showItems();
 };
 
 const archiveItem = async function (line) {
