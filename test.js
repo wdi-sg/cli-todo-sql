@@ -27,8 +27,8 @@ const createTable = function () {
     "CREATE TABLE items (id SERIAL PRIMARY KEY," +
       "name TEXT," +
       "done BOOLEAN," +
-      "created DATE," +
-      "updated DATE," +
+      "created TIMESTAMP," +
+      "updated TIMESTAMP," +
       "archived BOOLEAN)")
     .then()
     .catch(err => handleErr(err));
