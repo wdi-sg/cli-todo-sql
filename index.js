@@ -53,6 +53,19 @@ client.connect((err) => {
           console.log(`ID ${res.rows[0].id} has been inserted, result: `, res.rows);
         }
       });
+    }else if(process.argv[2] === "show"){
+      let queryText = `SELECT * FROM items`;
+      client.query(queryText, (err, res) => {
+        if(err) {
+          console.log("Error in query: ", err.message);
+        }else {
+          for(let i=0; i<res.rows.length; i++){
+            let line = `${res.rows[i].id}. ${res.rows[i].isdone} - ${res.rows[i].task}, Created at: ${res.rows[i].created_at}, Updated at: ${res.rows[i].updated_at}`;
+            console.log(line);
+          }
+
+        }
+      });
     }
   }
 });
