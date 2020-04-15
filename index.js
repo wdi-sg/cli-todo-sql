@@ -13,7 +13,7 @@ const client = new pg.Client(configs);
 //------------------------------
 
 let inputArr = process.argv;
-console.log(inputArr);
+// console.log(inputArr);
 
 let queryDoneShowAll = (err, result) => {
   if (err) {
@@ -23,9 +23,9 @@ let queryDoneShowAll = (err, result) => {
       let list = result.rows;
       let displayText;
       if (list[i].done === null) {
-        displayText = `${list[i].id}. [ ] - ${list[i].item}`;
+        displayText = `${list[i].id}. [ ] - ${list[i].item} - ${list[i].created_at}`;
       } else {
-        displayText = `${list[i].id}. [${list[i].done}] - ${list[i].item}`;
+        displayText = `${list[i].id}. [${list[i].done}] - ${list[i].item} - ${list[i].created_at}`;
       }
       console.log(displayText);
     }
@@ -45,12 +45,14 @@ let clientConnectionCallBack = (err) => {
   } else if (inputArr[2] === "show") {
     let queryText = "SELECT * from todolist ORDER BY id ASC";
     client.query(queryText, queryDoneShowAll);
+
   } else if (inputArr[2] === "add") {
-    let queryText = `INSERT INTO todolist (item) VALUES ('${inputArr[3]}')`;
-    console.log(queryText);
+    let now = new Date().toUTCString();
+    let queryText = `INSERT INTO todolist (item, created_at) VALUES ('${inputArr[3]}', '${now}')`;
     client.query(queryText, queryDoneDoNth);
     queryText = "SELECT * from todolist ORDER BY id ASC";
     client.query(queryText, queryDoneShowAll);
+
   } else if (inputArr[2] === "done") {
     let queryText = `UPDATE todolist SET done='X' WHERE id='${inputArr[3]}'`;
     client.query(queryText, queryDoneDoNth);

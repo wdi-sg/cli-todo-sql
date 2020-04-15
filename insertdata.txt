@@ -1,0 +1,8 @@
+CREATE TABLE todolist (
+  id SERIAL PRIMARY KEY,
+  done TEXT,
+  item TEXT,
+  created_at DATE,
+  updated_at DATE,
+  complete_time INTEGER
+);
