@@ -1,18 +1,14 @@
 const pg = require('pg');
-
 const configs = {
     user: 'chelseaee',
     host: '127.0.0.1',
     database: 'todo',
     port: 5432,
 };
-
 const client = new pg.Client(configs);
-
 const d = new Date();
 const today = `${d.getDate()}/${(d.getMonth()+1)}/${d.getFullYear()}`
 const now = `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
-
 const command = process.argv[2]
 
 let queryDoneCallback = (err, res) => {
@@ -23,8 +19,6 @@ let queryDoneCallback = (err, res) => {
     }
     client.end();
 };
-
-
 
 let clientConnectionCallback = (err) => {
 
@@ -59,41 +53,46 @@ let clientConnectionCallback = (err) => {
         const targetItem = process.argv[3];
         const script = `UPDATE items SET archived = FALSE WHERE id=${targetItem}`
         client.query(script, queryDoneCallback);
-    } else if (command === 'stats') {
 
+
+        // USE ONE OF THE STATS COMMANDS.
+    } else if (command === 'stats') {
         const statQuery = process.argv[3]
         let script;
-
         switch (statQuery) {
+
+            // GET THE AVERAGE COMPLETION TIME OF EACH TASK.
             case 'complete-time':
-                script = `SELECT *,EXTRACT(EPOCH FROM (completed_at - created_at)/60)  as mins_diff from items`
+                script = `SELECT *, EXTRACT(EPOCH FROM (completed_at - created_at)/60)  as mins_diff from items`
                 client.query(script, getAvgTime);
                 break;
+                // GET THE TASKS WITH THE LONGEST / SHORTEST COMPLETION TIME.
             case 'best-worst':
-                script = `SELECT *,EXTRACT(EPOCH FROM (completed_at - created_at)/60) as mins_diff from items ORDER BY mins_diff ASC`
+                script = `SELECT *, EXTRACT(EPOCH FROM (completed_at - created_at)/60) as mins_diff from items ORDER BY mins_diff ASC`
                 client.query(script, bestWorst)
                 break;
+                // GET THE AVERAGE NUMBER OF ITEMS ADDED PER DAY.
             case 'add-time':
-                script = `SELECT name, date(created_at) AS MYDATE FROM items;`
+                script = `SELECT name, date(created_at) AS date FROM items;`
                 client.query(script, avgItemsPerDay)
                 break;
+                //GET THE ITEMS CREATED BETWEEN TWO DATES.
             case 'between':
                 var date1 = process.argv[4];
                 var date2 = process.argv[5];
-                if (process.argv[6]==='complete-time') {
+                if (process.argv[6] === 'complete-time') {
                     let order = (process.argv[7]).toLowerCase();
                     script = `SELECT * FROM items WHERE date(created_at) BETWEEN to_date('${date1}', 'DD/MM/YY') AND to_date('${date2}', 'DD/MM/YY') ORDER BY EXTRACT(EPOCH FROM (completed_at - created_at)/60) ${order}`;
-
                 } else {
                     script = `SELECT * FROM items WHERE date(created_at) BETWEEN to_date('${date1}', 'DD/MM/YY') AND to_date('${date2}', 'DD/MM/YY')`;
                 }
-                
                 client.query(script, queryDoneCallback);
                 break;
-            case 'completed-between': 
+                //GET THE ITEMS THAT WERE COMPLETED BETWEEN TWO DATES.
+            case 'completed-between':
                 var date1 = process.argv[4];
                 var date2 = process.argv[5];
-                script = `SELECT * FROM items WHERE date(created_at) BETWEEN to_date('${date1}', 'DD/MM/YY') AND to_date('${date2}', 'DD/MM/YY') AND completion = true`;
+                script = `SELECT * FROM items WHERE date(completed_at) BETWEEN to_date('${date1}', 'DD/MM/YY') AND to_date('${date2}', 'DD/MM/YY')`
                 client.query(script, queryDoneCallback);
                 break;
             default:
@@ -110,46 +109,6 @@ client.connect(clientConnectionCallback);
 
 
 // ======= HELPER FUNCTIONS ============
-
-
-
-//Function to format colors of console logs: lavender, green or red.
-const colorLog = (col, output) => {
-    let r;
-    let g;
-    let b
-
-    switch (col) {
-        case 'lavender':
-            r = 181;
-            g = 126;
-            b = 220
-            break;
-        case 'red':
-            r = 230;
-            g = 0;
-            b = 0;
-            break;
-        case 'green':
-            r = 0;
-            g = 230;
-            b = 0
-            break;
-        case 'white':
-            r = 255;
-            g = 255;
-            b = 255;
-            break;
-        default:
-            r = 255;
-            g = 255;
-            b = 255;
-            break;
-    }
-
-    console.log(`\x1b[38;2;${r};${g};${b}m%s\x1b[0m`, output);
-}
-
 
 const formatDisplay = res => {
     res.rows.forEach(item => {
@@ -198,21 +157,61 @@ const bestWorst = (err, res) => {
 const avgItemsPerDay = (err, res) => {
     err && console.log(`Query error`, err.message)
     const array = res.rows;
-    let noOfDays = 0;
+    let noOfDays = 1;
 
     array.forEach((item, index) => {
-        //If this is not the last item in the array, 
-        if (array[index + 1]) {
-            //If the next item does not have a similar date, add to the number of days.
-            if (item.date !== array[index + 1].date) {
-                noOfDays++;
+        let nextItem = array[index+1]
+        let thisDate = item.date.toString();
+
+        //If this is not the last item in the array
+        if (nextItem) {
+            let nextDate = nextItem.date.toString();
+
+            //And the next date is not the same, add to noOf Days.
+            if (thisDate!==nextDate) {
+                noOfDays++;        
             }
             //If this is the last item in the array, save the latest count into the array.
-        } else {
-            noOfDays++;
         }
     })
+
     const avgNoPerDay = array.length / noOfDays;
     colorLog('lavender', `Average number of items created per day = ${avgNoPerDay}`);
     client.end();
+}
+
+
+//Function to format colors of console logs: lavender, green or red.
+const colorLog = (col, output) => {
+    let r;
+    let g;
+    let b
+    switch (col) {
+        case 'lavender':
+            r = 181;
+            g = 126;
+            b = 220
+            break;
+        case 'red':
+            r = 230;
+            g = 0;
+            b = 0;
+            break;
+        case 'green':
+            r = 0;
+            g = 230;
+            b = 0
+            break;
+        case 'white':
+            r = 255;
+            g = 255;
+            b = 255;
+            break;
+        default:
+            r = 255;
+            g = 255;
+            b = 255;
+            break;
+    }
+    console.log(`\x1b[38;2;${r};${g};${b}m%s\x1b[0m`, output);
 }
