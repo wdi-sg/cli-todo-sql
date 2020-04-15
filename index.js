@@ -110,8 +110,20 @@ const archiveItem = function () {
   return;
 };
 
-const markDone = function () {
-  console.log("mark item done");
+const archiveItem = async function (line) {
+  checkConnection();
+
+  let args = line.split(" ");
+  let idMap = await makeIdMap();
+  let archiveId = args.splice(1, args.length - 1).join(" ");
+  let value = [idMap[archiveId]];
+  let query =
+      "UPDATE items " +
+      "SET archived = true " +
+      "WHERE id = $1";
+
+  await client.query(query, value);
+  showItems();
   return;
 };
 
@@ -139,6 +151,7 @@ const despatch = {
   "show": showItems,
   "add": addItem,
   "done": markDone,
+  "archive": archiveItem,
   "stats": getStat
 };
 
