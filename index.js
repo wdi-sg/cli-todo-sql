@@ -54,7 +54,6 @@ let clientConnectionCallback = (err) => {
         const script = `UPDATE items SET archived = FALSE WHERE id=${targetItem}`
         client.query(script, queryDoneCallback);
 
-
         // USE ONE OF THE STATS COMMANDS.
     } else if (command === 'stats') {
         const statQuery = process.argv[3]
@@ -68,12 +67,12 @@ let clientConnectionCallback = (err) => {
                 break;
                 // GET THE TASKS WITH THE LONGEST / SHORTEST COMPLETION TIME.
             case 'best-worst':
-                script = `SELECT *, EXTRACT(EPOCH FROM (completed_at - created_at)/60) as mins_diff from items ORDER BY mins_diff ASC`
+                script = `SELECT *, EXTRACT(EPOCH FROM (completed_at - created_at)/60) as mins_diff from items WHERE completion = true ORDER BY mins_diff ASC`
                 client.query(script, bestWorst)
                 break;
                 // GET THE AVERAGE NUMBER OF ITEMS ADDED PER DAY.
             case 'add-time':
-                script = `SELECT name, date(created_at) AS date FROM items;`
+                script = `SELECT name, date(created_at) AS date FROM items WHERE completion = true;`
                 client.query(script, avgItemsPerDay)
                 break;
                 //GET THE ITEMS CREATED BETWEEN TWO DATES.
@@ -99,17 +98,13 @@ let clientConnectionCallback = (err) => {
                 return console.log(`Error. Stat query not found.`)
                 break;
         }
-
-
     }
-
 };
 
 client.connect(clientConnectionCallback);
 
 
 // ======= HELPER FUNCTIONS ============
-
 const formatDisplay = res => {
     res.rows.forEach(item => {
         if (item.archived) {
@@ -127,6 +122,7 @@ const formatDisplay = res => {
     });
 };
 
+//Get the average time of completion for all the items.
 
 const getAvgTime = (err, res) => {
     if (err) {
@@ -141,6 +137,7 @@ const getAvgTime = (err, res) => {
     client.end();
 };
 
+//Get the items with the longest (worst) and shortest (best) completion times.
 const bestWorst = (err, res) => {
 
     err && console.log(`Query error`, err.message)
@@ -174,7 +171,6 @@ const avgItemsPerDay = (err, res) => {
             //If this is the last item in the array, save the latest count into the array.
         }
     })
-
     const avgNoPerDay = array.length / noOfDays;
     colorLog('lavender', `Average number of items created per day = ${avgNoPerDay}`);
     client.end();
