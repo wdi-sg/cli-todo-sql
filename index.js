@@ -28,7 +28,7 @@ let queryDoneCallback = (err, result) => {
         );
         result.rows.forEach(el => {
             console.log(`
-${el.name} - [${el.done}]
+${el.id}. ${el.name} - [${el.done}]
 created_at: ${el.created_date}
 updated_at: ${el.updated_date}
             `);
@@ -62,6 +62,21 @@ let clientConnectionCallback = (err) => {
 
         client.end();
     });
+  }
+
+  else if(process.argv[2] === 'done'){
+    let text = `update items set done='X' where id=${process.argv[3]}`;
+
+    client.query(text, (err, result) => {
+        if (err) {
+            console.log("query error: " + err)
+        }
+        else{
+            console.log("Update Successful!")
+        }
+
+        client.end();
+    })
   }
 
 };
