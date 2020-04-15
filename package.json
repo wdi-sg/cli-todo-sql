@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/kokchuantan/cli-todo-sql#readme",
   "dependencies": {
+    "moment": "^2.24.0",
     "pg": "^8.0.2"
   }
 }

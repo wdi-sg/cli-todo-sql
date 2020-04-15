@@ -1,6 +1,7 @@
-console.log("works!!", process.argv[2]);
+// console.log("works!!", process.argv[2]);
 
 const pg = require('pg');
+const moment = require('moment');
 
 const configs = {
     user: 'kokchuantan',
@@ -21,6 +22,7 @@ let queryDoneCallback = (err, result) => {
 };
 
 let clientConnectionCallback = (err) => {
+    let dateAt = moment().format('MMMM Do YYYY, h:mm:ss a');
     let command = process.argv[2];
     let userInput = process.argv[3];
     let notDone = ' [ ] ';
@@ -30,20 +32,36 @@ let clientConnectionCallback = (err) => {
             console.log("error", err.message);
         }
 
-        let text = "INSERT INTO items (name,status) VALUES ($1,$2) RETURNING id";
+        let text = "INSERT INTO items (name,status,created) VALUES ($1,$2,$3) RETURNING id";
 
-        const values = [userInput,notDone];
+        const values = [userInput, notDone, dateAt];
         client.query(text, values, queryDoneCallback);
-    }
-    else if(command === 'done'){
-      if (err) {
-        console.log("error", err.message);
-    }
+    } else if (command === 'done') {
+        if (err) {
+            console.log("error", err.message);
+        }
 
-    let text = "update items set status = $2 where id = $1 RETURNING id";
-    id = parseInt(userInput);
-    const values = [id,done];
-    client.query(text, values, queryDoneCallback);
+        let text = "update items set status = $2, completed = $3 where id = $1 RETURNING id";
+       
+        const values = [userInput, done,dateAt];
+        client.query(text, values, queryDoneCallback);
+    } else if (command === 'archive') {
+        if (err) {
+            console.log("error", err.message);
+        }
+
+        let text = "delete from items where id = $1 RETURNING id";
+
+        const values = [userInput];
+        client.query(text, values, queryDoneCallback);
+    } else if (command === 'show') {
+        if (err) {
+            console.log("error", err.message);
+        }
+
+        let text = "select * from items";
+
+        client.query(text, queryDoneCallback);
     }
 };
 
