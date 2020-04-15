@@ -59,7 +59,7 @@ let clientConnectionCallback = (err) => {
             console.log("error", err.message);
         }
 
-        let text = "select * from items";
+        let text = "select * from items order by id asc";
         client.query(text, (err,result) => {
           for(let i = 0; i< result.rows.length; i++){
             let id = result.rows[i].id;
