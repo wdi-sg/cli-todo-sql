@@ -55,9 +55,9 @@ const makeIdMap = async function () {
 const showItems = async function () {
   checkConnection();
 
-  let query = "SELECT * FROM items";
+  let query = "SELECT * FROM items ORDER BY id";
   let results = await client.query(query);
-  let items = results.rows;
+  let items = results.rows.filter(e => e.archived === false);
 
   let idMap = {};
   for (let i = 1; i <= items.length; i++) {
