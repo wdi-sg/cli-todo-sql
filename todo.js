@@ -25,11 +25,11 @@ let clientConnectionCallback = (err) => {
     console.log( "error", err.message );
   }
 
-  const actToDo = process.argv[2];
+  const actToDo = process.argv[2].toLowerCase();
 
   if (actToDo === "show") {
     //to show all the list
-    let showItems = "SELECT * FROM items";
+    let showItems = "SELECT * FROM items ORDER BY id ASC";
     client.query(showItems, queryDoneCallback);
 
   } else if (actToDo === "add") {
@@ -41,6 +41,13 @@ let clientConnectionCallback = (err) => {
     const values = [notDone, taskDescription];
 
     client.query(addItems, values, queryDoneCallback);
+  } else if (actToDo === "done") {
+    const done = '[x]';
+    const idToMark = process.argv[3];
+
+    let updateStatus = "UPDATE items SET status = "+"'[x]'"+" WHERE id = "+idToMark;
+
+    client.query(updateStatus, queryDoneCallback);
   }
 
 
