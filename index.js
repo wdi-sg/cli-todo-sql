@@ -11,6 +11,20 @@ const configs = {
 let data={task:[]};
 const client = new pg.Client(configs);
 
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2)
+        month = '0' + month;
+    if (day.length < 2)
+        day = '0' + day;
+
+    return [day, month, year].join('/');
+}
+
 let queryDoneCallback = (err, result) => {
     if (err) {
       console.log("query error", err.message);
@@ -128,12 +142,33 @@ let queryDoneCallbackBestWorst = (err, result) => {
 };
 
 
+let queryDoneCallbackBetween = (err, result) => {
+    if (err) {
+      console.log("query error", err.message);
+    } else {
+      console.log(`All result between ${process.argv[3]} and  ${process.argv[4]}`, result.rows );
+      let completedTask=[];
+      for(let count=0; count<result.rows.length;count++)
+      {
+        if(result.rows[count].completion==='[  X  ]')
+        {
+          completedTask.push(result.rows[count])
+        }
+      }
+      console.log(`All completed result between ${process.argv[3]} and  ${process.argv[4]}`, completedTask );
+    }
+    client.end();
+};
+
+
 ///////// adding Task
 let addTask=()=>{
+  let date=new Date();
+  let formattedDate=formatDate(date);
   let timeSecond=new Date();
   n=timeSecond.getTime()/1000;
     let text = "INSERT INTO items (completion, name, created_at, created_second) VALUES ($1, $2, $3, $4) RETURNING id, created_at";
-  const values = ["[    ]",process.argv[3], Date(),n];
+  const values = ["[    ]",process.argv[3], formattedDate,n];
   //console.log(text);
 
   client.query(text, values, queryDoneCallback);
@@ -173,13 +208,14 @@ let archiveTask=()=>{
 //////////////////Done Tasks
 let doneTask=()=>{
   console.log(typeof Date());
-  let date = Date();
+  let date = new Date();
+    let formattedDate=formatDate(date);
   let calculateDate=new Date();
   let calculateSecond=calculateDate.getTime()/1000;
   //let ReadText="SELECT * from items";
   //client.query(ReadText, queryDoneCallback);
   let Updatetext = `UPDATE items SET completion = REPLACE(completion,completion,'[  X  ]'), finished_at =($1), completedtime =  ($2)- created_second  WHERE id=${parseInt(process.argv[3])}`;
-    client.query(Updatetext,[date, calculateSecond], queryDoneCallback2);
+    client.query(Updatetext,[formattedDate, calculateSecond], queryDoneCallback2);
 
 
 }
@@ -201,7 +237,10 @@ let computeAverage=()=>{
 }
 
 
-
+let findBetween=()=>{
+  let text="SELECT * FROM items WHERE created_at >= ($1) AND created_at <= ($2)"
+  client.query(text,[process.argv[3], process.argv[4]],queryDoneCallbackBetween);
+}
 
 
 
@@ -231,7 +270,7 @@ if(process.argv[2].toLowerCase()==="update")
   updateTask();
   return
 }
-  console.log("archive");
+
 if(process.argv[2].toLowerCase()==="archive")
 {
 
@@ -245,7 +284,11 @@ if(process.argv[2].toLowerCase()==="stats")
 
 
     return;
-
+}
+if(process.argv[2].toLowerCase()==="between")
+{
+  findBetween();
+  return
 }
 };
 
