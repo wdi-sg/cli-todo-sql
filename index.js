@@ -147,15 +147,15 @@ rl.prompt();
 
 rl.on('line', (line) => {
   line = line.trim();
-  if (line.toLowerCase() === 'q') {
+  let command = line.split(" ")[0];
+  if (command.toLowerCase() === 'q') {
     console.log("\nQuit\n");
     process.exit(0);
-  } else if (despatch[line.toLowerCase()] === undefined) {
-    console.log(line);
-    line = "help";
+  } else if (despatch[command.toLowerCase()] === undefined) {
+    command = "help";
   }
 
-  despatch[line]();
+  despatch[command](line);
 
 }).on('close', () => {
   process.exit(0);
