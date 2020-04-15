@@ -160,6 +160,38 @@ let queryDoneCallbackBetween = (err, result) => {
     client.end();
 };
 
+function compare(a, b) {
+  // Use toUpperCase() to ignore character casing
+  const timingA = a.completedtime;
+  const timingB = b.completedtime;
+
+  let comparison = 0;
+  if (timingA > timingB) {
+    comparison = 1;
+  } else if (timingA < timingB) {
+    comparison = -1;
+  }
+  return comparison;
+}
+
+let queryDoneCallbackBetweenAsc = (err, result) => {
+    if (err) {
+      console.log("query error", err.message);
+    } else {
+     // console.log(`All result between ${process.argv[4]} and  ${process.argv[5]}`, result.rows );
+      let completedTask=[];
+      for(let count=0; count<result.rows.length;count++)
+      {
+        if(result.rows[count].completion==='[  X  ]')
+        {
+          completedTask.push(result.rows[count])
+        }
+      }
+      completedTask.sort(compare);
+      console.log(`All completed result between ${process.argv[4]} and  ${process.argv[5]}`, completedTask );
+    }
+    client.end();
+};
 
 ///////// adding Task
 let addTask=()=>{
@@ -242,7 +274,10 @@ let findBetween=()=>{
   client.query(text,[process.argv[3], process.argv[4]],queryDoneCallbackBetween);
 }
 
-
+let findBetweenAsc=()=>{
+  let text="SELECT * FROM items WHERE created_at >= ($1) AND created_at <= ($2)"
+  client.query(text,[process.argv[4], process.argv[5]],queryDoneCallbackBetweenAsc);
+}
 
 let clientConnectionCallback = (err) => {
 
@@ -277,7 +312,14 @@ if(process.argv[2].toLowerCase()==="archive")
   archiveTask();
   return
 }
-if(process.argv[2].toLowerCase()==="stats")
+ console.log("ok");
+if(process.argv[2].toLowerCase()==="stats"&& process.argv[3].toLowerCase()==="between" && process.argv[6]==="complete-time"  && process.argv[7].toLowerCase()==="asc")
+{
+  console.log("ok");
+  findBetweenAsc();
+  return;
+}
+if(process.argv[2].toLowerCase()==="stats"&&process.argv[4]===undefined)
 {
 
     computeAverage();
@@ -290,6 +332,8 @@ if(process.argv[2].toLowerCase()==="between")
   findBetween();
   return
 }
+console.log("invalid");
+return;
 };
 
 client.connect(clientConnectionCallback);
