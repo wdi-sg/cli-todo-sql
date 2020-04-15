@@ -8,13 +8,8 @@ const configs = {
 };
 const client = new pg.Client(configs);
 
-let queryDoneCallback = (err, result) => {
-    if (err) {
-      console.log("query error", err.message);
-    } else {
-      console.log("result", result.rows );
-    }
-    client.end();
+const handleError = function (err) {
+  console.log("Connect error:", err);
 };
 
 let clientConnectionCallback = (err) => {
