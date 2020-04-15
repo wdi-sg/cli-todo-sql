@@ -140,8 +140,14 @@ const archiveItem = async function (line) {
   return;
 };
 
-const getStat = function () {
-  console.log("get stats");
+const getStat = function (line) {
+  //comp-time: average completion time
+  //add-time: average amount of items added per day
+  //best-worst: fastest and slowest completed item
+  //add-bet: added between two days
+  //done-bet: completed between two days
+
+  
   return;
 };
 
