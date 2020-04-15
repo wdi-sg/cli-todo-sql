@@ -70,7 +70,9 @@ let clientConnectionCallback = (err) => {
   }
   // Mark item as done
   else if(process.argv[2] === 'done'){
-    let text = `update items set done='X' where id=${process.argv[3]}`;
+    const updatedDate = `TO_CHAR(NOW() :: DATE, 'dd/mm/yyyy')`;
+
+    let text = `update items set done='X', updated_date=${updatedDate} where id=${process.argv[3]}`;
 
     client.query(text, (err, result) => {
         if (err) {
