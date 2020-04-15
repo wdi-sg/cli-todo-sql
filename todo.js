@@ -34,27 +34,34 @@ let clientConnectionCallback = (err) => {
 
   } else if (actToDo === "add") {
     //to add item to the list
-    const notDone = '[ ]';
     const taskDescription = process.argv[3];
+    const createdDate = new Date();
+    const updatedDate = null;
 
-    let addItems = "INSERT INTO items (status, task) VALUES ($1, $2) RETURNING id";
-    const values = [notDone, taskDescription];
+    let addItems = "INSERT INTO items (task, created_at, update_at) VALUES ($1, $2, $3) RETURNING id";
+    const values = [taskDescription, createdDate, updatedDate];
 
     client.query(addItems, values, queryDoneCallback);
   } else if (actToDo === "done") {
-    const done = '[x]';
+
+    //the id of the task that was done to be marked done.
+    const markDone = "X";
     const idToMark = process.argv[3];
+    const updatedDate = new Date();
 
-    let updateStatus = "UPDATE items SET status = "+"'[x]'"+" WHERE id = "+idToMark;
+    let updateStatus = "UPDATE items SET status=$1, update_at=$2 WHERE id=$3";
 
-    client.query(updateStatus, queryDoneCallback);
+    const values = [markDone, updatedDate, idToMark];
+
+    client.query(updateStatus, values, queryDoneCallback);
+  } else if (actToDo === "delete") {
+    const idRowToDelete = process.argv[3];
+
+    let deleteRow = "DELETE FROM items WHERE id = $1";
+    const values = [idRowToDelete];
+
+    client.query(deleteRow, values, queryDoneCallback);
   }
-
-
-  // let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
-
-  // const values = ["hello"];
-
 };
 
 client.connect(clientConnectionCallback);
