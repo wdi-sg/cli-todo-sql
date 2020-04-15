@@ -83,6 +83,16 @@ client.connect((err) => {
           });
         }
       });
+    }else if(process.argv[2] === "delete"){
+      let queryText = `DELETE from items WHERE id = ${process.argv[3]}`;
+
+      client.query(queryText, (err, res) => {
+        if(err){
+          console.log("Error in query: ", err.message);
+        }else {
+          console.log("Delete action completed");
+        }
+      });
     }
   }
 });
