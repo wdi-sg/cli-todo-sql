@@ -35,11 +35,39 @@ let queryDoneCallback2 = (err, result) => {
     client.end();
 };
 
+let queryDoneCallbackAverage = (err, result) => {
+
+    if (err) {
+      console.log("query error", err.message);
+    } else {
+      //console.log("result", result.rows );
+      let completedTime=[];
+      let sum=0;
+      for(let count=0; count<result.rows.length; count++)
+      {
+        if ( result.rows[count].completedtime!==null)
+        {
+          completedTime.push(result.rows[count].completedtime);
+        }
+      }
+      for(let loopCount=0; loopCount < completedTime.length;loopCount++)
+      {
+        sum += completedTime[loopCount];
+      }
+      console.log("Average completed time is "+sum/completedTime.length+ " seconds.");
+      //result.rows[0].completedtime="Something";
+      //console.log(result.rows);
+
+    }
+    client.end();
+};
+
+
 ///////// adding Task
 let addTask=()=>{
   let timeSecond=new Date();
-  n=timeSecond.getTime();
-    let text = "INSERT INTO items (completion, name, created_at, completedtime) VALUES ($1, $2, $3, $4) RETURNING id, created_at";
+  n=timeSecond.getTime()/1000;
+    let text = "INSERT INTO items (completion, name, created_at, created_second) VALUES ($1, $2, $3, $4) RETURNING id, created_at";
   const values = ["[    ]",process.argv[3], Date(),n];
   //console.log(text);
 
@@ -82,13 +110,18 @@ let doneTask=()=>{
   console.log(typeof Date());
   let date = Date();
   let calculateDate=new Date();
-  let calculateSecond=calculateDate.getTime();
+  let calculateSecond=calculateDate.getTime()/1000;
   //let ReadText="SELECT * from items";
   //client.query(ReadText, queryDoneCallback);
-  let Updatetext = `UPDATE items SET completion = REPLACE(completion,completion,'[  X  ]'), finished_at =($1), completedtime =  ($2)- completedtime  WHERE id=${parseInt(process.argv[3])}`;
+  let Updatetext = `UPDATE items SET completion = REPLACE(completion,completion,'[  X  ]'), finished_at =($1), completedtime =  ($2)- created_second  WHERE id=${parseInt(process.argv[3])}`;
     client.query(Updatetext,[date, calculateSecond], queryDoneCallback2);
 
 
+}
+
+let computeAverage=()=>{
+  let text="SELECT * FROM items";
+  client.query(text, queryDoneCallbackAverage);
 }
 
 let clientConnectionCallback = (err) => {
@@ -123,6 +156,14 @@ if(process.argv[2].toLowerCase()==="archive")
 
   archiveTask();
   return
+}
+if(process.argv[2].toLowerCase()==="stats")
+{
+  if(process.argv[3].toLowerCase()==="complete-time")
+  {
+    computeAverage();
+    return;
+  }
 }
 };
 
