@@ -32,10 +32,9 @@ const connectSql = function () {
   return client.connect();
 };
 
-//helper functions
-const parseDate = function (dateObj) {
-  if (dateObj === "") {
-    return "";
+const checkConnection = async function () {
+  if (!connected) {
+    await connectSql();
   }
   let options  = {
     weekday: "short",
@@ -51,9 +50,7 @@ const parseDate = function (dateObj) {
 
 // todo manipulation functions
 const showItems = async function () {
-  if (!connected) {
-    await connectSql();
-  }
+  checkConnection();
 
   let query = "SELECT * FROM items";
   let results = await client.query(query);
@@ -92,9 +89,7 @@ const showItems = async function () {
 };
 
 const addItem = async function (line) {
-  if (!connected) {
-    await connectSql();
-  }
+  checkConnection();
 
   let args = line.split(" ");
   let item = args.splice(1, args.length - 1).join(" ");
