@@ -86,6 +86,8 @@ const showItems = async function () {
     console.log(index, done, title, cDateStr, uDateStr);
   }
 
+  console.log("-".repeat(80));
+
   rl.prompt();
 };
 
