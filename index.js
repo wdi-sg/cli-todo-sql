@@ -1,14 +1,11 @@
-console.log("works!!", process.argv[2]);
-
+// node-postgres config
 const pg = require('pg');
-
 const configs = {
-    user: 'akira',
+    user: 'dwu',
     host: '127.0.0.1',
     database: 'todo',
     port: 5432,
 };
-
 const client = new pg.Client(configs);
 
 let queryDoneCallback = (err, result) => {
