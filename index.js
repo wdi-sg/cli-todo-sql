@@ -33,11 +33,24 @@ let queryDoneShowAll = (err, result) => {
   client.end();
 };
 
+let queryDoneDoNth = (err, result) => {
+  if (err) {
+    console.log("QUERY ERROR:", err.message);
+  } 
+};
+
 let clientConnectionCallBack = (err) => {
   if (err) {
     console.log("CONNECTION ERROR:", err.message);
   } else if (inputArr[2] === "show") {
     let queryText = "SELECT * from todolist";
+    client.query(queryText, queryDoneShowAll);
+  }
+  else if (inputArr[2] === "add") {
+    let queryText = `INSERT INTO todolist (item) VALUES ('${inputArr[3]}')`;
+    console.log(queryText);
+    client.query(queryText, queryDoneDoNth);
+    queryText = "SELECT * from todolist";
     client.query(queryText, queryDoneShowAll);
   }
 };
