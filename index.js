@@ -3,7 +3,7 @@ console.log("works!!", process.argv[2]);
 const pg = require('pg');
 
 const configs = {
-    user: 'akira',
+    user: 'postgres',
     host: '127.0.0.1',
     database: 'todo',
     port: 5432,
@@ -23,14 +23,21 @@ let queryDoneCallback = (err, result) => {
 let clientConnectionCallback = (err) => {
 
   if( err ){
-    console.log( "error", err.message );
+    console.log( "Connection callback error", err.message );
+  }
+  else if (process.argv[2] === 'show'){
+    let text = "select * from items";
+
+    client.query(text, queryDoneCallback);
+  }
+  else if (process.argv[2] === 'add'){
+    let text = "insert into items (name) values ($1) returning id";
+
+    const values = [process.argv[3]];
+
+    client.query(text, values, queryDoneCallback);
   }
 
-  let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
-
-  const values = ["hello"];
-
-  client.query(text, values, queryDoneCallback);
 };
 
 client.connect(clientConnectionCallback);
