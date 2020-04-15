@@ -64,7 +64,6 @@ let clientConnectionCallback = (err) => {
         const statQuery = process.argv[3]
         let script;
 
-
         switch (statQuery) {
             case 'complete-time':
                 script = `SELECT *,EXTRACT(EPOCH FROM (completed_at - created_at)/60)  as mins_diff from items`
@@ -79,9 +78,15 @@ let clientConnectionCallback = (err) => {
                 client.query(script, avgItemsPerDay)
                 break;
             case 'between':
-                const date1 = process.argv[4];
-                const date2 = process.argv[5];
+                var date1 = process.argv[4];
+                var date2 = process.argv[5];
                 script = `SELECT * FROM items WHERE date(created_at) BETWEEN to_date('${date1}', 'DD/MM/YY') AND to_date('${date2}', 'DD/MM/YY')`;
+                client.query(script, queryDoneCallback);
+                break;
+            case 'completed-between': 
+                var date1 = process.argv[4];
+                var date2 = process.argv[5];
+                script = `SELECT * FROM items WHERE date(created_at) BETWEEN to_date('${date1}', 'DD/MM/YY') AND to_date('${date2}', 'DD/MM/YY') AND completion = true`;
                 client.query(script, queryDoneCallback);
                 break;
             default:
