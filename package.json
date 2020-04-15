@@ -1,0 +1,12 @@
+{
+  "name": "3_cli-todo-sql",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/dyanawu/sei-cli-todo-sql",
+  "author": "Dyana Wu <dyanawu@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "moment": "^2.24.0",
+    "pg": "^8.0.2"
+  }
+}
