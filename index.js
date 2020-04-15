@@ -80,7 +80,14 @@ let clientConnectionCallback = (err) => {
             case 'between':
                 var date1 = process.argv[4];
                 var date2 = process.argv[5];
-                script = `SELECT * FROM items WHERE date(created_at) BETWEEN to_date('${date1}', 'DD/MM/YY') AND to_date('${date2}', 'DD/MM/YY')`;
+                if (process.argv[6]==='complete-time') {
+                    let order = (process.argv[7]).toLowerCase();
+                    script = `SELECT * FROM items WHERE date(created_at) BETWEEN to_date('${date1}', 'DD/MM/YY') AND to_date('${date2}', 'DD/MM/YY') ORDER BY EXTRACT(EPOCH FROM (completed_at - created_at)/60) ${order}`;
+
+                } else {
+                    script = `SELECT * FROM items WHERE date(created_at) BETWEEN to_date('${date1}', 'DD/MM/YY') AND to_date('${date2}', 'DD/MM/YY')`;
+                }
+                
                 client.query(script, queryDoneCallback);
                 break;
             case 'completed-between': 
