@@ -4,7 +4,7 @@
   "description": "![https://i.giphy.com/media/26ufnwz3wDUli7GU0/giphy.webp](https://i.giphy.com/media/26ufnwz3wDUli7GU0/giphy.webp)",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js"
+    "test": "node index.js add go shopping, feed dog, swim practice, code app, meet gabriel, eat bak kut teh"
   },
   "repository": {
     "type": "git",

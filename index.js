@@ -8,7 +8,6 @@ const configs = {
   database: 'todo',
   port: 5432,
 };
-
 const client = new pg.Client(configs);
 
 let queryDoneCallback = (err, result) => {
@@ -16,26 +15,27 @@ let queryDoneCallback = (err, result) => {
     console.log("query error", err.message);
   } else {
     // console.log("result", result.rows );
-    let queryText = 'SELECT * FROM items';
+    let queryText = 'SELECT * FROM items ORDER BY id ASC';
     client.query(queryText, (err, res) => {
       if (err) {
         //Throw connection terminated error
-        if(err.message != "Connection terminated"){
+        if (err.message != "Connection terminated") {
           console.log("query error", err.message);
         }
       } else {
         // iterate through all of your results:
-        var outList = "";
+        var outList = "\n";
         for (let i = 0; i < res.rows.length; i++) {
           var record = res.rows[i];
           if (record.done == false) {
             var string = `${i + 1}. [ ] - ${record.name}\n`;
             outList += string;
-          } else {
+          } else if (record.done == true) {
             var string = `${i + 1}. [X] - ${record.name}\n`;
             outList += string;
           }
         }
+        outList += "\n";
         console.log(outList);
       }
       client.end();
@@ -65,7 +65,7 @@ let clientConnectionCallback = (err) => {
   var command = process.argv[2];
   switch (command) {
     case 'add':
-      let text = "INSERT INTO items (name,done) VALUES ($1,$2) RETURNING id";
+      let addQuery = "INSERT INTO items (name,done) VALUES ($1,$2) RETURNING id";
       var input = inputString();
       input = input.trim();
       var inputArr = [];
@@ -76,12 +76,51 @@ let clientConnectionCallback = (err) => {
       }
       for (id in inputArr) {
         const values = [inputArr[id], "f"];
-        client.query(text, values, queryDoneCallback);
+        client.query(addQuery, values, queryDoneCallback);
       }
       break;
     case "show":
-      let queryText = 'SELECT * FROM items';
-      client.query(queryText, queryDoneCallback);
+      let showQuery = 'SELECT * FROM items';
+      client.query(showQuery, (err, res) => {
+        if (err) {
+          console.log("query error", err.message);
+          
+        } else {
+          // iterate through all of your results:
+          if(res.rows.length==0){
+            console.log("\nNo items to show\n");
+            client.end();
+          }else{
+            client.query(showQuery,queryDoneCallback);
+          }
+        }
+      })
+      break;
+    case "done":
+      let idMap = {};
+      let queryText = 'SELECT * FROM items ORDER BY id ASC';
+      client.query(queryText, (err, res) => {
+        if (err) {
+          console.log("query error", err.message);
+        } else {
+          // iterate through all of your results:
+          for (let i = 0; i < res.rows.length; i++) {
+            var record = res.rows[i];
+            idMap[`${i + 1}`] = record.id;
+          }
+          let doneQuery = "UPDATE items SET done= 't' WHERE id = $1";
+          var input = parseInt(inputString());
+          var mappedId = idMap[`${input}`];
+          // console.log(idMap);
+          // console.log(mappedId);
+          if (mappedId != isNaN) {
+            const value = [mappedId];
+            client.query(doneQuery, value, queryDoneCallback);
+          }
+        }
+      })
+
+
       break;
     default:
       break;
