@@ -49,7 +49,7 @@ let clientConnectionCallback = (err) => {
     const idToMark = process.argv[3];
     const updatedDate = new Date();
 
-    let updateStatus = "UPDATE items SET status=$1, update_at=$2 WHERE id=$3";
+    let updateStatus = "UPDATE items SET status=$1, update_at=$2, complete_time=age($2, created_at) WHERE id=$3";
 
     const values = [markDone, updatedDate, idToMark];
 
@@ -61,6 +61,10 @@ let clientConnectionCallback = (err) => {
     const values = [idRowToDelete];
 
     client.query(deleteRow, values, queryDoneCallback);
+  } else if (actToDo === "stats") {
+
+    let avgCompleteTime = "SELECT AVG(complete_time) FROM items";
+    client.query(avgCompleteTime, queryDoneCallback);
   }
 };
 
