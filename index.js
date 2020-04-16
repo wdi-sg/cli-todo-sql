@@ -36,6 +36,7 @@ checkCommand = (input) => {
 
         // This function runs if query returns a response
         let queryDoneCallback = (err, result) => {
+
             if (err) {
                 console.log("////////////////////////");
                 console.log("ADD ERROR");
@@ -98,6 +99,26 @@ checkCommand = (input) => {
         commandStatus = true;
         console.log("-----------------------");
         console.log("INITIALIZE COMMAND: DELETE");
+
+        queryDoneCallback = (err, remainder) =>{
+            if(err){
+                console.log("////////////////////////");
+                console.log("CONNECTION ERROR :");
+                console.log( err.message );
+                console.log("////////////////////////");
+            } else {
+                console.log("-----------------------");
+                console.log("deleted")
+            }
+            client.end();
+        }
+
+        deleteList = () =>{
+            let text = "DELETE FROM todoitems WHERE id = 10"
+            client.query(text,queryDoneCallback)
+        };
+
+        client.connect(deleteList);
     }
 
 
