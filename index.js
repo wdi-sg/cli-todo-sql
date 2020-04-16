@@ -129,7 +129,7 @@ let clientConnectionCallback = (err) => {
       console.log("\nNo items to show");
       client.query(emptyQuery, queryDoneCallback);
       break;
-      case "archive":
+    case "archive":
       let idMap2 = {};
       let queryText2 = 'SELECT * FROM items ORDER BY id ASC';
       client.query(queryText2, (err, res) => {
