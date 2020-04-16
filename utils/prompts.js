@@ -94,8 +94,9 @@ const listTodos = async toDoItems => {
       .all( (await toDoItems)
       .map(item => {
     return {
-      name: chalk.blue(item.title) + "\t" +
-            chalk.white(item.created_at),
+      name:   chalk.blue(item.title) + "\t" +
+              chalk.white(moment(item.created_at).fromNow() + "\t" +
+              chalk.white(item.created_at)),
       value: item.id,
       checked: item.is_done
     }

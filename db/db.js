@@ -14,13 +14,13 @@ class DB {
     (SELECT datname FROM pg_catalog.pg_database
      WHERE datname ='${this.dbName}');`
     const func = res => {if (!res.rows[0].exists) this.createDB()}
-    this.execute(text,func).catch(e=>console.error(e))
+    this.execute(text, undefined, func).catch(e=>console.error(e))
   }
 
   createDB () {
     const text = `create database ${this.dbName};`
     const func = this.createTableIfNotExist()
-    this.execute(text,func).catch(e=>console.log(e))
+    this.execute(text, undefined, func).catch(e=>console.log(e))
   }
 
   createTableIfNotExist () {
@@ -44,16 +44,25 @@ class DB {
   }
 
   async updateAll(objArr) {
-    console.log(objArr)
-   //this.update(objArr[0])
+    let objs = await objArr
+    objs = objs.filter(item=>item['_id']>=0)
+    const actions = objs.map(this.update.bind(this))
+    const res = Promise.all(actions)
+    return res;
   }
 
-  update(obj) {
-    console.log(Object.getOwnPropertyNames(obj))
-    const text = `update todo set `
+  async update(obj) {
+    const id = obj['id'] || obj['_id']
+    delete obj.id && delete obj._id
+    const fields = Object.keys(obj)
+    const vals = Object.values(obj)
+    const placeHolers = vals.map((v,i)=>`\$${i+1}`)
+    let text = `update todo set (${fields.join(',')}) = (${placeHolers.join()}) `;
+        text+= `where _id=${id}`
+    return this.execute(text,vals)
   }
 
-  async execute (text, func, values) {
+  async execute (text, values, func) {
     const client = await this.pool.connect()
     let res
     try {

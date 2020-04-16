@@ -8,9 +8,10 @@ const {TodoList, TodoItem} = require('./todo');
 const TAG_LINE = 'DO IT !'
 
 let todoList;
+let db;
 
 const init = async () => {
-  const db = new DB()
+  db = new DB()
   const data = await db.fetchToDoData()
   todoList = new TodoList(data)
 }
@@ -23,7 +24,9 @@ const displayWelcomeText = () => {
 const handleShowTodos = async () => {
   const checkedIdsObj = await prompt.listTodos(todoList.getTodoItems())
   const checkedIds = await checkedIdsObj.todoList;
-  todoList.setChecked(checkedIds)
+  await todoList.setChecked(checkedIds)
+  await db.updateAll(todoList.getTodoItems())
+    .catch(e=>console.log(e))
 }
 
 const addNewTodos = async () => {
