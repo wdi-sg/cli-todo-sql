@@ -84,14 +84,14 @@ let clientConnectionCallback = (err) => {
       client.query(showQuery, (err, res) => {
         if (err) {
           console.log("query error", err.message);
-          
+
         } else {
           // iterate through all of your results:
-          if(res.rows.length==0){
+          if (res.rows.length == 0) {
             console.log("\nNo items to show\n");
             client.end();
-          }else{
-            client.query(showQuery,queryDoneCallback);
+          } else {
+            client.query(showQuery, queryDoneCallback);
           }
         }
       })
@@ -119,14 +119,43 @@ let clientConnectionCallback = (err) => {
           }
         }
       })
-
-
+      break;
+    case "reset":
+      let resetQuery = "UPDATE items SET done= 'f' WHERE id > 1";
+      client.query(resetQuery, queryDoneCallback);
+      break;
+    case "empty":
+      let emptyQuery = "TRUNCATE TABLE items";
+      console.log("\nNo items to show");
+      client.query(emptyQuery, queryDoneCallback);
+      break;
+      case "archive":
+      let idMap2 = {};
+      let queryText2 = 'SELECT * FROM items ORDER BY id ASC';
+      client.query(queryText2, (err, res) => {
+        if (err) {
+          console.log("query error", err.message);
+        } else {
+          // iterate through all of your results:
+          for (let i = 0; i < res.rows.length; i++) {
+            var record = res.rows[i];
+            idMap2[`${i + 1}`] = record.id;
+          }
+          let deleteQuery = "DELETE FROM items WHERE id = $1";
+          var input = parseInt(inputString());
+          var mappedId = idMap2[`${input}`];
+          // console.log(idMap);
+          // console.log(mappedId);
+          if (mappedId != isNaN) {
+            const value = [mappedId];
+            client.query(deleteQuery, value, queryDoneCallback);
+          }
+        }
+      })
       break;
     default:
       break;
   }
-
-
 };
 
 client.connect(clientConnectionCallback);
