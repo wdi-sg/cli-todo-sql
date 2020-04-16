@@ -159,6 +159,8 @@ let clientConnectionCallback = (err) => {
       })
       break;
     default:
+      console.log("Invalid command, try again")
+      client.end();
       break;
   }
 };
