@@ -33,7 +33,8 @@ let queryDoneCallback = (err, result) => {
           } else if (record.done == true) {
             var string = `${i + 1}. [X] - ${record.name}`;
             if (record.updated_at != null) {
-              string += ` | updated_at: ${record.updated_at}\n`;
+              var date = formatDateTime(record.updated_at);
+              string += ` | updated_at: ${date}\n`;
             }
             else { string += "\n" }
             outList += string;
@@ -163,3 +164,9 @@ let clientConnectionCallback = (err) => {
 };
 
 client.connect(clientConnectionCallback);
+
+function formatDateTime(date) {
+  var formatDate = date.toLocaleDateString();
+  var formatTime = date.toLocaleTimeString();
+  return `${formatDate} ${formatTime}`;
+}
