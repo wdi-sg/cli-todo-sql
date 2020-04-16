@@ -43,6 +43,16 @@ class DB {
     return res.rows;
   }
 
+  async updateAll(objArr) {
+    console.log(objArr)
+   //this.update(objArr[0])
+  }
+
+  update(obj) {
+    console.log(Object.getOwnPropertyNames(obj))
+    const text = `update todo set `
+  }
+
   async execute (text, func, values) {
     const client = await this.pool.connect()
     let res

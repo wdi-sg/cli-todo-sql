@@ -1,33 +1,39 @@
-
 class TodoList {
 
-  constructor(dataSource) {
-    this.dataSource = dataSource
+  constructor (data) {
+    this.data = data
+    this.todoItems = this.deSerializeJson(data)
   }
 
-  async getTodoItems() {
-    const data = await this._getData();
-    return this.deSerializeJson(data)
+  async getTodoItems () {
+    return this.todoItems
   }
 
-  async _getData () {
-    return this.dataSource
-      .fetchToDoData()
-      .catch(e=>console.error(e))
+  async setChecked (checkedIds) {
+    this.markAllIncomplete();
+    (await this.todoItems)
+      .filter(item => checkedIds.includes(item._id))
+      .forEach(item => item.markAsDone())
   }
 
-  async deSerializeJson(arr) {
-    const todoItems = arr.map(rawObj=> {
+  getItemById (id) {
+    return this.todoItems.find(item => item.id === id)
+  }
+
+  async markAllIncomplete () {
+    (await this.todoItems).forEach(item => {
+      item.markAsIncomplete()
+    })
+  }
+
+  async deSerializeJson (arr) {
+    const todoItems = arr.map(rawObj => {
       return Object.create(TodoItem.prototype,
         Object.getOwnPropertyDescriptors(rawObj))
     })
     return todoItems
   }
 
-  add(todoItem) {
-
-  }
-  //
   // add(todoItem) {
   //
   //   this.list.then(
@@ -35,15 +41,7 @@ class TodoList {
   //   )
   // }
   //
-  // getItemById(id) {
-  //   return this.list.find(item => item.id === id);
-  // }
-  //
-  // markAllIncomplete() {
-  //   this.list.forEach(item => {
-  //     item.markAsIncomplete();
-  //   });
-  // }
+
   //
   // remove(id) {
   //   const indexOfItemToRemove = this.list.findIndex(item => item.id === id);
@@ -67,43 +65,44 @@ class TodoList {
   // }
   //
   // // save() {
-  // //   files.save(this.list).then(r => console.log("file saved")).catch(e => console.log(e));
+  // //   files.save(this.list)
+  //      .then(r => console.log("file saved"))
+  //      .catch(e => console.log(e));
   // // }
 
 }
 
 class TodoItem {
+  static _numInstances = 0
 
-  static _numInstances = 0;
-
-  constructor(content) {
-    this._id = 0
-    this.title = content;
-    this.created_at = new Date();
-    this.is_done = false;
+  constructor (content) {
+    this._id = -1
+    this.title = content
+    this.created_at = new Date()
+    this.is_done = false
   }
 
-  toggleDone() {
-    this.is_done ? this.is_done = false : this.is_done = true;
-    return this.is_done;
+  get id () {
+    return this._id
   }
 
-  get id() {
-    return this._id;
+  toggleDone () {
+    this.is_done ? this.is_done = false : this.is_done = true
+    return this.is_done
   }
 
-
-  markAsDone() {
-    this.is_done = true;
+  markAsDone () {
+    this.is_done = true
   }
 
-  markAsIncomplete() {
-    this.is_done = false;
+  markAsIncomplete () {
+    this.is_done = false
   }
+
 }
 
 module.exports = {
   TodoList,
   TodoItem
-};
+}
 

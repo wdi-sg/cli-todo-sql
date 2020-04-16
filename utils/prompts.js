@@ -90,7 +90,9 @@ const addTodo = () => {
 };
 
 const listTodos = async toDoItems => {
-  const menuChoices = Promise.all( (await toDoItems).map(item => {
+  const menuChoices = Promise
+      .all( (await toDoItems)
+      .map(item => {
     return {
       name: chalk.blue(item.title) + "\t" +
             chalk.white(item.created_at),
