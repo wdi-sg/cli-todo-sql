@@ -1,0 +1,21 @@
+{
+  "name": "cli-todo-sql",
+  "version": "1.0.0",
+  "description": "![https://i.giphy.com/media/26ufnwz3wDUli7GU0/giphy.webp](https://i.giphy.com/media/26ufnwz3wDUli7GU0/giphy.webp)",
+  "main": "index.js",
+  "scripts": {
+    "fill": "node index.js add go shopping, feed dog, swim practice, code app, meet gabriel, eat bak kut teh",
+    "reset": "node index.js reset",
+    "empty": "node index.js empty"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mdazharaw/cli-todo-sql.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mdazharaw/cli-todo-sql/issues"
+  },
+  "homepage": "https://github.com/mdazharaw/cli-todo-sql#readme"
+}
