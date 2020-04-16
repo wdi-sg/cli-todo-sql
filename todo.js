@@ -3,20 +3,13 @@ class TodoList {
 
   constructor(dataSource) {
     this.dataSource = dataSource
-    this.setData = this.setData.bind(this);
-    this.setData()
-    this.test();
+    this.list = this.getData()
   }
 
-
-  setData () {
-    this.dataSource.fetchToDoData().then(data => {
-      this.list = data
-    })
-  }
-
-  test() {
-    console.log(this.list)
+  async getData () {
+    let data = this.dataSource.fetchToDoData()
+      .catch(e=>console.error(e))
+    return data
   }
 
   deSerializeJson(rawJson) {
