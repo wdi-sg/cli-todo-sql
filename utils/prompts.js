@@ -1,11 +1,8 @@
 const inquirer = require('inquirer');
-const files = require('./files');
 const chalk = require('chalk');
 const moment = require('moment');
 
 inquirer.registerPrompt('search-checkbox', require('inquirer-search-checkbox'));
-
-const currentPath = files.getCurrentDir();
 
 const displayMenu = () => {
   const choices = [
@@ -20,6 +17,10 @@ const displayMenu = () => {
     {
       name: 'Delete items',
       value: 'delete'
+    },
+    {
+      name:"Quit",
+      value: 'quit'
     }
   ];
 
@@ -86,33 +87,30 @@ const addTodo = () => {
     message: 'Add another one?'
   }];
   return inquirer.prompt(questions);
-
 };
 
-
-const displayTodo = (todoListArr) => {
-  const choices = todoListArr.map((todoItem, index) => {
+const listTodos = async toDoItems => {
+  const menuChoices = Promise.all( (await toDoItems).map(item => {
     return {
-      name: chalk.blue(todoItem.title) + "\t" + chalk.white(moment(todoItem.createdAt).fromNow() +
-        "\t" + chalk.white(todoItem.createdAt)),
-      value: todoItem.id,
-      checked: todoItem.isDone
+      name: chalk.blue(item.title) + "\t" +
+            chalk.white(item.created_at),
+      value: item.id,
+      checked: item.is_done
     }
-  });
-  const questions = {
-    type: "checkbox",
-    name: 'todoList',
-    message: "Select to mark/unmark as done:",
-    choices: choices
-  };
+  }));
 
-  return inquirer.prompt(questions);
+  const questions = [{
+    type: 'checkbox',
+    name: 'todoList',
+    message: 'Select to mark/unmark as done:',
+    choices: await menuChoices
+  }];
+  return inquirer.prompt(questions)
 };
 
 module.exports = {
   displayMenu,
-  confirmAddNewDB: confirmDefaultDataPath,
-  displayTodo,
+  listTodos,
   addTodo,
   deleteTodo
 };

@@ -3,59 +3,72 @@ class TodoList {
 
   constructor(dataSource) {
     this.dataSource = dataSource
-    this.list = this.getData()
   }
 
-  async getData () {
-    let data = this.dataSource.fetchToDoData()
+  async getTodoItems() {
+    const data = await this._getData();
+    return this.deSerializeJson(data)
+  }
+
+  async _getData () {
+    return this.dataSource
+      .fetchToDoData()
       .catch(e=>console.error(e))
-    return data
   }
 
-  deSerializeJson(rawJson) {
-    return rawJson.map(json => {
-      return Object.create(TodoItem.prototype, Object.getOwnPropertyDescriptors(json));
-    });
+  async deSerializeJson(arr) {
+    const todoItems = arr.map(rawObj=> {
+      return Object.create(TodoItem.prototype,
+        Object.getOwnPropertyDescriptors(rawObj))
+    })
+    return todoItems
   }
 
   add(todoItem) {
-    this.list.push(todoItem);
-  }
 
-  getItemById(id) {
-    return this.list.find(item => item.id === id);
   }
-
-  markAllIncomplete() {
-    this.list.forEach(item => {
-      item.markAsIncomplete();
-    });
-  }
-
-  remove(id) {
-    const indexOfItemToRemove = this.list.findIndex(item => item.id === id);
-    this.list.splice(indexOfItemToRemove, 1);
-  }
-
-  markAsDone(arrIndex) {
-    this.list[arrIndex].markAsDone();
-  }
-
-  markAsIncomplete(arrIndex) {
-    this.list[arrIndex].markAsIncomplete();
-  }
-
-  getTodoList() {
-    return this.list;
-  }
-
-  toJson() {
-    return this.list;
-  }
-
-  // save() {
-  //   files.save(this.list).then(r => console.log("file saved")).catch(e => console.log(e));
+  //
+  // add(todoItem) {
+  //
+  //   this.list.then(
+  //
+  //   )
   // }
+  //
+  // getItemById(id) {
+  //   return this.list.find(item => item.id === id);
+  // }
+  //
+  // markAllIncomplete() {
+  //   this.list.forEach(item => {
+  //     item.markAsIncomplete();
+  //   });
+  // }
+  //
+  // remove(id) {
+  //   const indexOfItemToRemove = this.list.findIndex(item => item.id === id);
+  //   this.list.splice(indexOfItemToRemove, 1);
+  // }
+  //
+  // markAsDone(arrIndex) {
+  //   this.list[arrIndex].markAsDone();
+  // }
+  //
+  // markAsIncomplete(arrIndex) {
+  //   this.list[arrIndex].markAsIncomplete();
+  // }
+  //
+  // getTodoList() {
+  //   return this.list;
+  // }
+  //
+  // toJson() {
+  //   return this.list;
+  // }
+  //
+  // // save() {
+  // //   files.save(this.list).then(r => console.log("file saved")).catch(e => console.log(e));
+  // // }
 
 }
 
@@ -64,14 +77,15 @@ class TodoItem {
   static _numInstances = 0;
 
   constructor(content) {
-    this._id = TodoItem._generateId;
+    this._id = 0
     this.title = content;
-    this.createdAt = new Date();
-    this.isDone = false;
+    this.created_at = new Date();
+    this.is_done = false;
   }
 
   toggleDone() {
-    this.isDone ? this.isDone = false : this.isDone = true;
+    this.is_done ? this.is_done = false : this.is_done = true;
+    return this.is_done;
   }
 
   get id() {
@@ -79,18 +93,13 @@ class TodoItem {
   }
 
 
-  static get _generateId() {
-    return ++this._numInstances;
-  }
-
   markAsDone() {
-    this.isDone = true;
+    this.is_done = true;
   }
 
   markAsIncomplete() {
-    this.isDone = false;
+    this.is_done = false;
   }
-
 }
 
 module.exports = {
