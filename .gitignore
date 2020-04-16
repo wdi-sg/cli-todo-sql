@@ -2,3 +2,6 @@
 .svn
 *~
 .*.swp
+
+
+node_modules
