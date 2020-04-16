@@ -48,9 +48,7 @@ const clientConnectionCallback = (err) => {
 
   if( err ){
     console.log( "error", err.message );
-  }
-
-  if (user_command === 'add'){
+  } else if (user_command === 'add'){
     queryText = 'INSERT INTO todolist (thing, done) VALUES ($1, $2) RETURNING *';
     values = [process.argv[3], '[ ]']; 
     client.query(queryText, values, callbackShow);
