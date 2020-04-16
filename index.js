@@ -10,6 +10,7 @@ const configs = {
 };
 const client = new pg.Client(configs);
 
+// Shows todo list once any query finishes
 let queryDoneCallback = (err, result) => {
   if (err) {
     console.log("query error", err.message);
@@ -50,6 +51,7 @@ let queryDoneCallback = (err, result) => {
 
 };
 
+// Reads arguments into string
 var inputString = function () {
   var stringArr = process.argv;
   var remove = stringArr.splice(0, 3);
@@ -62,13 +64,18 @@ var inputString = function () {
   return outString;
 }
 
+// Main function that runs upon connection
 let clientConnectionCallback = (err) => {
 
   if (err) {
     console.log("error", err.message);
   }
+  // Command type
   var command = process.argv[2];
+
+  // Processing commands
   switch (command) {
+    // Able to add multiple strings, delimited by ','
     case 'add':
       let addQuery = "INSERT INTO items (name,done) VALUES ($1,$2) RETURNING id";
       var input = inputString();
@@ -84,6 +91,8 @@ let clientConnectionCallback = (err) => {
         client.query(addQuery, values, queryDoneCallback);
       }
       break;
+
+    // Triggers list to be displayed, or show no items if list is empty
     case "show":
       let showQuery = 'SELECT * FROM items';
       client.query(showQuery, (err, res) => {
@@ -101,6 +110,8 @@ let clientConnectionCallback = (err) => {
         }
       })
       break;
+
+    // Marks item as done, adds date time updated
     case "done":
       let idMap = {};
       let queryText = 'SELECT * FROM items ORDER BY id ASC';
@@ -125,15 +136,21 @@ let clientConnectionCallback = (err) => {
         }
       })
       break;
+
+    // Resets all items to not done
     case "reset":
       let resetQuery = "UPDATE items SET done= 'f', updated_at = NULL WHERE id > 1";
       client.query(resetQuery, queryDoneCallback);
       break;
+
+    // Resets list to being empty 
     case "empty":
       let emptyQuery = "TRUNCATE TABLE items";
       console.log("\nNo items to show");
       client.query(emptyQuery, queryDoneCallback);
       break;
+
+    // Removes list item from list
     case "archive":
       let idMap2 = {};
       let queryText2 = 'SELECT * FROM items ORDER BY id ASC';
@@ -158,6 +175,8 @@ let clientConnectionCallback = (err) => {
         }
       })
       break;
+
+    // For invalid commands
     default:
       console.log("Invalid command, try again")
       client.end();
@@ -167,6 +186,7 @@ let clientConnectionCallback = (err) => {
 
 client.connect(clientConnectionCallback);
 
+// Function to format date time value
 function formatDateTime(date) {
   var formatDate = date.toLocaleDateString();
   var formatTime = date.toLocaleTimeString();
