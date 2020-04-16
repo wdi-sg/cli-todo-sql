@@ -31,7 +31,11 @@ let queryDoneCallback = (err, result) => {
             var string = `${i + 1}. [ ] - ${record.name}\n`;
             outList += string;
           } else if (record.done == true) {
-            var string = `${i + 1}. [X] - ${record.name}\n`;
+            var string = `${i + 1}. [X] - ${record.name}`;
+            if (record.updated_at != null) {
+              string += ` | updated_at: ${record.updated_at}\n`;
+            }
+            else { string += "\n" }
             outList += string;
           }
         }
@@ -108,7 +112,7 @@ let clientConnectionCallback = (err) => {
             var record = res.rows[i];
             idMap[`${i + 1}`] = record.id;
           }
-          let doneQuery = "UPDATE items SET done= 't' WHERE id = $1";
+          let doneQuery = "UPDATE items SET done= 't', updated_at = current_timestamp WHERE id = $1"
           var input = parseInt(inputString());
           var mappedId = idMap[`${input}`];
           // console.log(idMap);
@@ -121,7 +125,7 @@ let clientConnectionCallback = (err) => {
       })
       break;
     case "reset":
-      let resetQuery = "UPDATE items SET done= 'f' WHERE id > 1";
+      let resetQuery = "UPDATE items SET done= 'f', updated_at = NULL WHERE id > 1";
       client.query(resetQuery, queryDoneCallback);
       break;
     case "empty":
