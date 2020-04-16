@@ -1,8 +1,22 @@
-const files = require('./utils/files');
 
 class TodoList {
+
   constructor(dataSource) {
-    this.list = dataSource.getData() || [];
+    this.dataSource = dataSource
+    this.setData = this.setData.bind(this);
+    this.setData()
+    this.test();
+  }
+
+
+  setData () {
+    this.dataSource.fetchToDoData().then(data => {
+      this.list = data
+    })
+  }
+
+  test() {
+    console.log(this.list)
   }
 
   deSerializeJson(rawJson) {
@@ -46,9 +60,9 @@ class TodoList {
     return this.list;
   }
 
-  save() {
-    files.save(this.list).then(r => console.log("file saved")).catch(e => console.log(e));
-  }
+  // save() {
+  //   files.save(this.list).then(r => console.log("file saved")).catch(e => console.log(e));
+  // }
 
 }
 

@@ -5,9 +5,9 @@ const chalk = require('chalk');
 const figlet = require('figlet');
 // const prompt = require('./utils/prompts');
 const DB = require('./db/db')
-// const {TodoList, TodoItem} = require('./todo');
-
+const {TodoList, TodoItem} = require('./todo');
 const TAG_LINE = 'DO IT !'
+
 let todoList;
 
 const displayWelcomeText = () => {
@@ -18,6 +18,7 @@ const displayWelcomeText = () => {
 const init = () => {
   clear();
   const db = new DB()
+  todoList = new TodoList(db)
 }
 
 const run = async () => {

@@ -25,7 +25,7 @@ class DB {
 
   createTableIfNotExist () {
     const text =
-      `create table todo
+      `create table if not exists todo
       ( _id serial
       constraint todo_pk
       primary key,
@@ -36,13 +36,21 @@ class DB {
     this.execute(text).catch(e=> console.error(e))
   }
 
+  // todo: this should be moved to dbTodo
+  async fetchToDoData () {
+    const text = `select * from todo;`
+    const res = await this.execute(text)
+    return res.rows;
+  }
+
   async execute (text, func, values) {
     const client = await this.pool.connect()
     let res
     try {
       if (values) res = await client.query(text, values)
       else res = await client.query(text)
-      if (func) func(res)
+      if (func) return func(res)
+      else return res;
     } finally {
       client.release()
     }
