@@ -28,6 +28,12 @@ client.connect((err) => {
         let inputId = process.argv[3];
         values = [inputId];
         queryText = "UPDATE items SET done='[x] -' WHERE id=$1 RETURNING *";
+    } else if (commandType === 'sort') {
+        if (process.argv[3].toUpperCase() === 'ASC') {
+            queryText = "SELECT * FROM items ORDER BY id ASC";
+        } else if (process.argv[3].toUpperCase() === 'DESC') {
+            queryText = "SELECT * FROM items ORDER BY id DESC";
+        }
     }
 
     client.query(queryText, values, (err, res) => {
