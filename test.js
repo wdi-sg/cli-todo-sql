@@ -11,6 +11,10 @@ const client = new pg.Client(configs);
 
 client.connect()
 
+client
+    .query("DROP TABLE items")
+    .catch(e => console.error(e.stack))
+
 let text =
 `CREATE TABLE IF NOT EXISTS items (
     id SERIAL PRIMARY KEY,

@@ -81,6 +81,17 @@ let showAll =()=>{
     getData(query).then(result=>handleShow(result)).then(()=>client.end()).catch(err=>console.log(err))
 }
 
+let handleCompleteTime =(array)=> {
+    let sum = array.reduce((acc, obj)=>{
+        let a = moment(obj.created_at);
+        let b = moment(obj.updated_at);
+        let diff = b.diff(a, 'minutes', true)
+        return acc + diff;
+    },0)
+    let average = sum / array.length;
+    console.log("Average time to complete in minutes: " + average);
+}
+
 // detecting user selection
 
 let query = null;
@@ -107,10 +118,23 @@ if (program.archive) {
     updateById(query).then(()=>showAll())
 };
 
-if (program.stats === true) console.log("stats options are: complete-time, add-time, best-worst");
-else if (program.stats === 'complete-time') console.log('complete-time'); // get data
-else if (program.stats === 'add-time') console.log('add-time'); // get data
-else if (program.stats === 'best-worst') console.log('best-worst'); // get data
+if (program.stats === true) {
+
+    console.log("stats options are: complete-time, add-time, best-worst");
+
+} else if (program.stats === 'complete-time') {
+
+    query = 'SELECT created_at, updated_at FROM items WHERE completed = true;'
+    getData(query)
+        .then((result)=>handleCompleteTime(result))
+        .then(()=>client.end())
+        .catch(err=>console.log(err))
+
+} else if (program.stats === 'add-time') {
+    console.log('add-time');
+} else if (program.stats === 'best-worst') {
+    console.log('best-worst');
+}
 
 
 if (program.between === true) console.log("options are: add, done");
