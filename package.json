@@ -1,0 +1,24 @@
+{
+  "name": "cli-todo-sql",
+  "version": "1.0.0",
+  "description": "To do list for the cli integrated with psql for persistant data",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hilman-Azfar/cli-todo-sql.git"
+  },
+  "author": "Hilman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hilman-Azfar/cli-todo-sql/issues"
+  },
+  "homepage": "https://github.com/Hilman-Azfar/cli-todo-sql#readme",
+  "dependencies": {
+    "commander": "^6.0.0",
+    "moment": "^2.27.0",
+    "pg": "^8.3.2"
+  }
+}
