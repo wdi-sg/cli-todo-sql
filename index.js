@@ -52,6 +52,15 @@ client.connect((error)=> {
     }
   });
 
-        }
+        } else if (operation === 'stats' && chore === "complete-time"){
+            queryText = 'SELECT AVG(doneAt-createdAt) FROM items';
+            client.query(queryText, (err, res) => {
+            if (err) {
+            console.log("query error", err.message);
+            } else {
+            console.log(res.rows);
     }
+        })
+    }
+}
 })
