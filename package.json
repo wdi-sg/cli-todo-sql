@@ -1,0 +1,29 @@
+{
+  "name": "cli-todo-sql",
+  "version": "1.0.0",
+  "description": "![https://i.giphy.com/media/26ufnwz3wDUli7GU0/giphy.webp](https://i.giphy.com/media/26ufnwz3wDUli7GU0/giphy.webp)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jellybellyy/cli-todo-sql.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jellybellyy/cli-todo-sql/issues"
+  },
+  "homepage": "https://github.com/jellybellyy/cli-todo-sql#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-react-views": "^0.11.0",
+    "method": "^2.0.0",
+    "moment": "^2.27.0",
+    "override": "0.0.1",
+    "pg": "^8.3.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  }
+}
