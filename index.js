@@ -71,14 +71,38 @@ let clientConnectionCallback = (err) => {
         client.query(text, values, queryDoneCallback);
     } else if (operation === "archive") {
         const values = [todoItem];
-        let text = "DELETE FROM items WHERE id= $1;"
-        client.query(text, values, queryDoneCallback);
+        client
+        .query("INSERT INTO archive SELECT status, name FROM items WHERE id= $1", values)
+        .then(result => console.log(`Archiving...`))
+        .catch(e => console.log(e.stack))
+
+        client
+        .query("DELETE FROM items WHERE id= $1;", values)
+        .then(result => console.log(`Done!`))
+        .catch(e => console.log(e.stack))
+        .then(() => client.end())
+
+        // let text = "DELETE FROM items WHERE id= $1;"
+        // client.query(text, values, queryDoneCallback);
     } else if (operation === "stats" && todoItem === "complete-time") {
         let text = "SELECT EXTRACT(EPOCH FROM avg(updated_at - created_at)) FROM items;"
         client.query(text, queryDoneCallback);
     } else if (operation === "stats" && todoItem ==="add-time") {
         let text = "SELECT count(1) FROM items WHERE created_at > now() - interval '1 day';"
         client.query(text, queryDoneCallback);
+    } else if (operation === "stats" && todoItem ==="best-worst") {
+        client
+        .query("SELECT name, time_taken FROM items WHERE time_taken = (SELECT min(time_taken) FROM items);")
+        .then(result => console.log(`Fastest task: ${result.rows[0].name} at ${result.rows[0].time_taken}`))
+        .catch(e => {
+            console.log(e.stack)
+        });
+
+        client
+        .query("SELECT name, time_taken FROM items WHERE time_taken = (SELECT max(time_taken) FROM items);")
+        .then(result => console.log(`Slowest task: ${result.rows[0].name} at ${result.rows[0].time_taken}`))
+        .catch(e => console.log(e.stack))
+        .then(() => client.end())
     }
 };
 
