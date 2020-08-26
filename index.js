@@ -165,7 +165,7 @@ let stats = (option) => {
       client.connect(avgTime);
       break;
     case "add-time":
-      client.connect();
+      client.connect(avgItemPerDay);
     default:
       console.log("Please key in valid option")
   }
@@ -189,9 +189,9 @@ switch (operator) {
     let option = process.argv[3]
     stats(option);
     break;
-  case "check":
-    client.connect(avgItemPerDay);
-    break;
+  // case "check":
+  //   client.connect(avgItemPerDay);
+  //   break;
   default:
     console.log("Please key in a valid action");
 }
