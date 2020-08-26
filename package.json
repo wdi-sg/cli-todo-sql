@@ -1,0 +1,30 @@
+{
+  "name": "cli-todo-sql",
+  "version": "1.0.0",
+  "description": "![https://i.giphy.com/media/26ufnwz3wDUli7GU0/giphy.webp](https://i.giphy.com/media/26ufnwz3wDUli7GU0/giphy.webp)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wdi-sg/cli-todo-sql.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wdi-sg/cli-todo-sql/issues"
+  },
+  "homepage": "https://github.com/wdi-sg/cli-todo-sql#readme",
+  "dependencies": {
+    "chalk": "^4.0.0",
+    "clear": "^0.1.0",
+    "dotenv": "^8.2.0",
+    "figlet": "^1.3.0",
+    "inquirer": "^7.1.0",
+    "inquirer-search-checkbox": "^1.0.0",
+    "moment": "^2.24.0",
+    "pg": "^8.0.2"
+  }
+}

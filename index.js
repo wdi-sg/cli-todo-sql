@@ -1,36 +1,67 @@
-console.log("works!!", process.argv[2]);
+const log = console.log;
+const clear = require('clear');
+const chalk = require('chalk');
+const figlet = require('figlet');
+const prompt = require('./utils/prompts');
+const DB = require('./db/db')
+const {TodoList, TodoItem} = require('./todo');
+const TAG_LINE = 'DO IT !'
 
-const pg = require('pg');
+let todoList;
+let db;
 
-const configs = {
-    user: 'akira',
-    host: '127.0.0.1',
-    database: 'todo',
-    port: 5432,
-};
+const init = async () => {
+  db = new DB()
+  const data = await db.fetchToDoData()
+  todoList = new TodoList(data)
+}
 
-const client = new pg.Client(configs);
+const displayWelcomeText = () => {
+  const options = { font: 'Star Wars', horizontalLayout: 'full' }
+  log(chalk.blueBright(figlet.textSync(TAG_LINE,options)))
+}
 
-let queryDoneCallback = (err, result) => {
-    if (err) {
-      console.log("query error", err.message);
-    } else {
-      console.log("result", result.rows );
-    }
-    client.end();
-};
+const handleShowTodos = async () => {
+  const checkedIdsObj = await prompt.listTodos(todoList.getTodoItems())
+  const checkedIds = await checkedIdsObj.todoList;
+  await todoList.setChecked(checkedIds)
+  await db.updateAll(todoList.getTodoItems())
+    .catch(e=>console.log(e))
+}
 
-let clientConnectionCallback = (err) => {
+const addNewTodos = async () => {
 
-  if( err ){
-    console.log( "error", err.message );
+}
+
+const getNewTodoInput = async (todosToAdd) => {
+  let userInput = await prompt.addTodo();
+  todosToAdd.push(userInput.newTodo);
+  if (userInput.askAgain) {
+    return await getNewTodoInput(todosToAdd)
+  } else {
+    return todosToAdd
   }
+}
 
-  let text = "INSERT INTO todo (name) VALUES ($1) RETURNING id";
 
-  const values = ["hello"];
+const getUserAction = async () => {
+  let answer = await prompt.displayMenu();
+  if (answer.command === 'view') {
+      await handleShowTodos()
+  } else if (answer.command === 'add') {
+    // await showTodo();
+  } else if (answer.command === 'delete') {
+    // await deleteTodo();
+  } else if (answer.command === 'quit') {
+    process.exit(0)
+  }
+  await getUserAction();
+}
 
-  client.query(text, values, queryDoneCallback);
-};
+const run = async () => {
+  init();
+  displayWelcomeText()
+  await getUserAction()
+}
 
-client.connect(clientConnectionCallback);
+run();
