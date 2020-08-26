@@ -36,7 +36,18 @@ client.connect((error)=> {
             if (err) {
             console.log("query error", err.message);
             } else {
-            console.log("result", res.rows);
+            console.log("here are your tasks", res.rows);
+    }
+  });
+
+        } else if(operation ==="done"){
+            let id = parseInt(chore);
+            queryText = `UPDATE items SET done=true WHERE id =${id} RETURNING name`;
+            client.query(queryText, (err, res) => {
+            if (err) {
+            console.log("query error", err.message);
+            } else {
+            console.log("done[X]", res.rows);
     }
   });
 
