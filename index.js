@@ -24,6 +24,7 @@ program
     .option('-d, --done <id>', 'mark item as done')
     .option('--stats [option]', 'show stat option')
     .option('--between [option]', 'show all items')
+    .option('--archive <id>', 'archive item')
     .option('--debug', 'show all options')
 
 
@@ -65,9 +66,11 @@ async function updateById(query) {
 
 let handleShow =(array)=> {
     array.forEach((item, index)=>{
-        let {id,completed,activity} = item;
+        let {id,completed,activity, created_at, updated_at} = item;
         let mark = completed ? "x" : " ";
-        let text = `${id}. [${mark}] - ${activity}`;
+        let date = moment(created_at).format("Do MMMM YYYY");
+        let doneDate = completed ? "Completed: " + moment(updated_at).format("Do MMMM YYYY") : "";
+        let text = `${id}. [${mark}] - ${activity} Created: ${date} ${doneDate}`;
         console.log(text);
     })
 }
@@ -96,9 +99,13 @@ if (program.add) {
 //update
 if (program.done) {
     query = `UPDATE items SET completed = true, updated_at = now() WHERE id = ${program.done}`
-    console.log(query);
     updateById(query).then(()=>showAll())
-}
+};
+
+if (program.archive) {
+    query = `UPDATE items SET archived = true, updated_at = now() WHERE id = ${program.archive}`
+    updateById(query).then(()=>showAll())
+};
 
 if (program.stats === true) console.log("stats options are: complete-time, add-time, best-worst");
 else if (program.stats === 'complete-time') console.log('complete-time'); // get data
