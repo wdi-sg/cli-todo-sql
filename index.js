@@ -20,7 +20,8 @@ client.connect((error)=> {
         console.log('ERROR AT CONNECT', error.message)
     } else {
         if(operation ==="add"){
-            queryText = 'INSERT INTO items (name, done) VALUES ($1, $2) RETURNING id';
+
+            queryText = 'INSERT INTO items (name, done) VALUES ($1, $2) RETURNING name';
             values = [chore, choreStatus];
             client.query(queryText,values, (err, res) => {
             if (err) {
@@ -29,6 +30,16 @@ client.connect((error)=> {
             console.log("result", res.rows);
     }
   });
+        } else if (operation ==='show'){
+            queryText = 'SELECT * FROM items';
+            client.query(queryText, (err, res) => {
+            if (err) {
+            console.log("query error", err.message);
+            } else {
+            console.log("result", res.rows);
+    }
+  });
+
         }
     }
 })
