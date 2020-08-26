@@ -61,6 +61,22 @@ client.connect((error)=> {
             console.log(res.rows);
     }
         })
+    } else if (operation === 'stats' && chore === "add-time"){
+        queryText = "SELECT COUNT(id), DATE_TRUNC('day',createdAt) FROM items GROUP BY DATE_TRUNC('day',createdAt)"
+        client.query(queryText, (err, res) => {
+            if (err) {
+            console.log("query error", err.message);
+            } else {
+                let listobj = res.rows;
+                let counter =0;
+                for(i=0; i<listobj.length; i++){
+                    counter += listobj[i].count
+                    let average = counter/listobj.length;
+                    console.log("The average added per day is", average)
+                }
+
+    }
+        })
     }
 }
 })

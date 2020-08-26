@@ -3,5 +3,7 @@ id SERIAL PRIMARY KEY,
 name TEXT,
 done TEXT,
 createdAt TIMESTAMP DEFAULT now(),
-doneAt TIMESTAMP NULL
+doneAt TIMESTAMP NULL,
+timeTaken TIMESTAMP NULL,
+
 )
