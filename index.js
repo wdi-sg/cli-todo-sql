@@ -32,10 +32,21 @@ let queryDoneCallback = (err, result) => {
                 console.log("Item successfully added!")
                 break;
             case "done":
-                console.log("Item marked as done")
+                console.log("Item marked as done.")
+                break;
+            case "archive":
+                console.log("Item successfully archived.")
+                break;
+            case "stats":
+                if (todoItem === "add-time") {
+                    console.log(`A total of ${result.rows[0].count} tasks have been added today`);
+                } else if (todoItem === "complete-time") {
+                    console.log(`The average time to complete all tasks is ${result.rows[0].date_part} seconds`);
+                }
                 break;
             default:
-                console.log("Invalid selection")
+                console.log("Invalid selection.")
+                break;
         }
     }
     client.end();
@@ -48,7 +59,7 @@ let clientConnectionCallback = (err) => {
         console.log( "error", err.message );
     }
     if (operation === "add"){
-        let text = "INSERT INTO items (status, name) VALUES ('[ ]', $1) RETURNING id;"
+        let text = "INSERT INTO items (status, name, updated_at) VALUES ('[ ]', $1, now()) RETURNING id;"
         const values = [todoItem];
         client.query(text, values, queryDoneCallback);
     } else if (operation === "show") {
@@ -56,8 +67,18 @@ let clientConnectionCallback = (err) => {
         client.query(text, queryDoneCallback);
     } else if (operation === "done") {
         const values = [todoItem];
-        let text = "UPDATE items SET status = '[x]' WHERE id = $1;"
+        let text = "UPDATE items SET status = '[x]', updated_at = now() WHERE id = $1;"
         client.query(text, values, queryDoneCallback);
+    } else if (operation === "archive") {
+        const values = [todoItem];
+        let text = "DELETE FROM items WHERE id= $1;"
+        client.query(text, values, queryDoneCallback);
+    } else if (operation === "stats" && todoItem === "complete-time") {
+        let text = "SELECT EXTRACT(EPOCH FROM avg(updated_at - created_at)) FROM items;"
+        client.query(text, queryDoneCallback);
+    } else if (operation === "stats" && todoItem ==="add-time") {
+        let text = "SELECT count(1) FROM items WHERE created_at > now() - interval '1 day';"
+        client.query(text, queryDoneCallback);
     }
 };
 
