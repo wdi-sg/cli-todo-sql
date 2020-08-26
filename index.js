@@ -42,8 +42,8 @@ client.connect((error)=> {
 
         } else if(operation ==="done"){
             let id = parseInt(chore);
-            choreStatus ='[X]';
-            queryText = `UPDATE items SET done=${choreStatus} WHERE id =${id} RETURNING name`;
+
+            queryText = `UPDATE items SET done='[X]', doneAt= NOW() WHERE id =${id} RETURNING name, doneAt`;
             client.query(queryText, (err, res) => {
             if (err) {
             console.log("query error", err.message);
