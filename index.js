@@ -43,7 +43,7 @@ client.connect((error)=> {
         } else if(operation ==="done"){
             let id = parseInt(chore);
 
-            queryText = `UPDATE items SET done='[X]', doneAt= NOW() WHERE id =${id} RETURNING name, doneAt`;
+            queryText = `UPDATE items SET done='[X]', doneAt= NOW() WHERE id =${id} RETURNING name, doneAt,timeTaken`;
             client.query(queryText, (err, res) => {
             if (err) {
             console.log("query error", err.message);
@@ -76,6 +76,15 @@ client.connect((error)=> {
                 }
 
     }
+        })
+    } else if(operation === 'stats' && chore === "best-worst") {
+        queryText ="select name, doneAt-createdAt as timeTaken from items";
+        client.query(queryText, (err, res) => {
+            if(err){
+                console.log("query error", err.message);
+            } else {
+               console.log(res.rows);
+            }
         })
     }
 }
