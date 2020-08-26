@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS item(
+id SERIAL PRIMARY KEY,
+name TEXT,
+done TEXT,
+createdAt TIMESTAMP DEFAULT now()
+)

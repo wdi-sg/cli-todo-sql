@@ -1,7 +1,7 @@
 console.log("works!!", process.argv[2]);
 const operation = process.argv[2];
 const chore = process.argv[3];
-let choreStatus = false;
+let choreStatus = "[ ]";
 const pg = require('pg');
 
 const configs = {
@@ -42,7 +42,8 @@ client.connect((error)=> {
 
         } else if(operation ==="done"){
             let id = parseInt(chore);
-            queryText = `UPDATE items SET done=true WHERE id =${id} RETURNING name`;
+            choreStatus ='[X]';
+            queryText = `UPDATE items SET done=${choreStatus} WHERE id =${id} RETURNING name`;
             client.query(queryText, (err, res) => {
             if (err) {
             console.log("query error", err.message);
