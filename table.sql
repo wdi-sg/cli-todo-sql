@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS todo (
+	id SERIAL PRIMARY KEY,
+	checkbox TEXT,
+	item TEXT,
+	log TIMESTAMP DEFAULT now(),
+	done TEXT
+)
