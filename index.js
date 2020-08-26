@@ -20,8 +20,8 @@ const client = new pg.Client(configs);
 // declare options here
 program
     .option('-s, --show', 'show all items')
-    .option('-a, --add', 'add new item')
-    .option('-d, --done', 'mark item as done')
+    .option('-a, --add <activity>', 'add new item')
+    .option('-d, --done <id>', 'mark item as done')
     .option('--stats [option]', 'show stat option')
     .option('--between [option]', 'show all items')
     .option('--debug', 'show all options')
@@ -33,14 +33,32 @@ program.parse(process.argv);
 
 // all handlers must end connection at the end of the execution
 
+client.connect();
 
 async function getData(query) {
     try{
-        client.connect();
         let result = await client.query(query);
-        client.end();
         return result.rows
     } catch(err) {
+        client.end();
+        console.log(err);
+    }
+}
+
+async function addData(query) {
+    try{
+        let result = await client.query(query);
+    } catch(err) {
+        client.end();
+        console.log(err);
+    }
+}
+
+async function updateById(query) {
+    try{
+        let result = await client.query(query);
+    } catch(err) {
+        client.end();
         console.log(err);
     }
 }
@@ -54,16 +72,33 @@ let handleShow =(array)=> {
     })
 }
 
+let showAll =()=>{
+    // always show in sequential order
+    query = "SELECT * FROM items WHERE archived = false ORDER BY id;";
+    getData(query).then(result=>handleShow(result)).then(()=>client.end()).catch(err=>console.log(err))
+}
+
 // detecting user selection
 
 let query = null;
 
 if (program.show) {
-    query = "SELECT * FROM items;";
-    getData(query).then(result=>handleShow(result))
+    showAll();
 };
-if (program.add) console.log("add"); //insert
-if (program.done) console.log("done"); //update
+
+//insert
+if (program.add) {
+    query = `INSERT INTO items (completed,archived,activity) VALUES (false, false,'${program.add}');`
+    addData(query);
+    showAll();
+};
+
+//update
+if (program.done) {
+    query = `UPDATE items SET completed = true, updated_at = now() WHERE id = ${program.done}`
+    console.log(query);
+    updateById(query).then(()=>showAll())
+}
 
 if (program.stats === true) console.log("stats options are: complete-time, add-time, best-worst");
 else if (program.stats === 'complete-time') console.log('complete-time'); // get data

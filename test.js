@@ -15,6 +15,7 @@ let text =
 `CREATE TABLE IF NOT EXISTS items (
     id SERIAL PRIMARY KEY,
     completed BOOLEAN,
+    archived BOOLEAN,
     activity TEXT,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
@@ -25,10 +26,9 @@ client
   .then(result => console.log(result.rows))
   .catch(e => console.error(e.stack))
 
-for (var i = 0; i < 8; i++) {
+for (var i = 0; i < 4; i++) {
     client
-        .query("INSERT INTO items (completed,activity) VALUES (false,'dummy walks into a wall');")
-        .then(result => console.log(result.rows))
+        .query("INSERT INTO items (completed,archived,activity) VALUES (false, false,'dummy walks into a wall');")
         .catch(e => console.error(e.stack))
 }
 
