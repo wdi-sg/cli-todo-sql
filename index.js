@@ -78,7 +78,7 @@ client.connect((error)=> {
     }
         })
     } else if(operation === 'stats' && chore === "best-worst") {
-        queryText ="select name, doneAt-createdAt as timeTaken from items";
+        queryText ="select name, EXTRACT(epoch FROM doneAt-createdAt) AS timeTaken FROM items WHERE doneAt IS NOT NULL ORDER BY timeTaken ASC";
         client.query(queryText, (err, res) => {
             if(err){
                 console.log("query error", err.message);
